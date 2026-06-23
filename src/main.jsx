@@ -38,6 +38,24 @@ const image = {
     "https://www.hcfsme.org/wp-content/uploads/2023/03/how-it-works.jpg",
     "https://www.hcfsme.org/wp-content/uploads/2024/03/sec_section-banner-05.jpg",
   ],
+  industryIcons: [
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/47.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/33.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/46.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/32.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/18.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/45.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/31.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/17.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/44.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/30.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/16.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/43.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/15.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/42.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/28.png",
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/29.png",
+  ],
 };
 
 const contact = {
@@ -77,12 +95,29 @@ const nav = [
 ];
 
 const mission = [
-  "作為全球化的堅定推動者，與世界各國政府、商協會、企業建立廣泛關係，創造共同價值。",
-  "向發展中國家的中小企業傳播中國與東亞新興工業國家的企業發展經驗。",
+  "作為全球化的堅定推動者，與世界各國政府、商協會、企業建立廣泛的關係，創造共同價值，積極推動技術與環球市場的發展。",
+  "向發展中國家的中小企業傳播中国與東亞新興工業國家的企業發展經驗。",
   "擔當中小企業和政府的溝通橋樑和紐帶，協助解決中小企業的營商問題。",
   "拓展中小企面對世界商機，協助政府招商引資，招才引智。",
   "推動企業社會責任，為全球經濟出謀獻策，推動中小企持續發展。",
-  "提倡和文化理念，實現政通人和、多元共融、和氣生財的商業倫理。",
+  "正面提倡「和」文化的概念三維度，實現政通人和，多元共融，和氣生財的商業倫理。",
+];
+
+const associationIntro = [
+  "香港中小企業工商聯合會(HCFSME港中聯)，是一家香港政府法定公認的非盈利國際組織。作为香港政府認可及支持的重要商會，香港中小企業工商聯合會自1998年創會以来，目前擁有三十多個行業委員會。",
+  "本會在香港政府指導下，一直以來都以服務及支援會員單位為己任，以支援全球華人地區中小企業为使命，聚集香港工商業各界優秀企業代表，以强企之心，行助企之事。港中聯將持續以中央政府和香港政府為後盾，貫徹「商 源 香 江，惠 通 全 球」的宗旨。",
+];
+
+const associationPurpose = [
+  "凝聚百年香江商業魅力，貫通新世代東亞發展能量，連接新興產業國事業機遇，傳播工業文明強盛經驗，實現全球中小企業之通贏未來。",
+  "本會全力推動及維護中小企業權益，面向全球助力各國政府優化投資及營商環境，加強本地與各國各級政府部門及領導官員的聯繫，凝聚業界，提升競爭力，共同拓展商機。",
+  "本會亦秉承「和文化思想」核心理念，以促進人與自然、社會及跨文化之和諧共生為責任，並在商務活動中積極推廣「和文化」宣傳教育工作。",
+];
+
+const associationStory = [
+  "港中聯成立於1998年，以「紮根大中華，立足香港，服務全球中小企業」為發展理念，目前擁有30多個行業委員會和地區辦事處。建會27年以來，港中聯成功幫助多個省市政府完成招商任務，幫助150多家大灣區中小企業獲得發展機遇，幫助9家企業實現成功上市，幫助240多家企業完成事業升級，並取得政府支持。",
+  "在全球化遭遇重大挑戰之際，港中聯從2018年開始，全面調整發展戰略，著手開展新的事業佈局，以「堅持國際化，大力推動區域化，開拓藍海新全球市場，推動中小企業轉型升級，通過全金融要素助力企業發展」為新發展方向，通過以點帶面的方式，積極開拓全新的市場，積極拓展新的發展方式。",
+  "目前，又與韓國的中小企業部、香港貿易發展局、澳門基金、大灣區政府一道，積極的推動中韓港青年創業計劃，助力中韓港的青年成功創業，順利融入大灣區的發展環境。在港中聯的帶領下，包括香港中小企業在內的全球華人企業都將為中國經濟的再次騰飛，為中國的高质量發展增添一份力量。",
 ];
 
 const funds = [
@@ -103,12 +138,14 @@ const directors = [
   ["韓君 Alex Han", "主席（國際）"],
   ["鄭綺文 Elaine Cheng", "會長"],
   ["李迎春 Shirley Li", "會董"],
+];
+
+const managementTeam = [
+  ...directors,
   ["黃桂林 Terence Wong", "監察委員會主席"],
   ["梁志超 Jacky Leung", "監察委員會副主席"],
-  ["謝慧", "執行會長"],
+  ["謝慧", "監察委員會副主席"],
   ["禹雲均 Jacky Yu", "執行會長"],
-  ["曾崇瑞 Sam Tsang", "名譽主席"],
-  ["潘永長", "名譽主席"],
 ];
 
 const news = [
@@ -299,7 +336,8 @@ function Header({ path, navigate, mobileOpen, setMobileOpen }) {
 
 function RenderPage({ path, navigate }) {
   if (path === "/") return <Home navigate={navigate} />;
-  if (path === "/about" || path === "/intro") return <AboutPage compact={path === "/intro"} />;
+  if (path === "/about") return <AboutPage navigate={navigate} />;
+  if (path === "/intro") return <IntroPage />;
   if (path === "/structure") return <StructurePage />;
   if (path === "/directors") return <DirectorsPage />;
   if (path === "/services") return <ServicesPage />;
@@ -401,41 +439,90 @@ function Home({ navigate }) {
   );
 }
 
-function AboutPage({ compact }) {
+function IntroPage() {
   return (
     <>
-      <PageHero {...pages[compact ? "/intro" : "/about"]} imageUrl={image.meeting} />
+      <PageHero {...pages["/intro"]} imageUrl={image.side} />
       <section className="section two-col">
         <div>
           <p className="kicker">簡介</p>
-          <h2>香港政府認可及支持的重要商會</h2>
+          <h2>香港特區政府法定公認的非盈利國際組織</h2>
         </div>
         <div className="rich-text">
-          <p>
-            香港中小企業工商聯合會是一家香港政府法定公認的非盈利國際組織。作為香港政府認可及支持的重要商會，本會自1998年創會以來，擁有三十多個行業委員會。
-          </p>
-          <p>
-            本會在香港政府指導下，以服務及支援會員單位為己任，以支援全球華人地區中小企業為使命，貫徹「商源香江 惠通全球」的宗旨。
-          </p>
+          {associationIntro.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
       <section className="section purpose">
-        <h2>本會宗旨</h2>
-        <p>
-          凝聚百年香江商業魅力，貫通新世代東亞發展能量，連接新興產業國事業機遇，傳播工業文明強盛經驗，實現全球中小企業之通贏未來。
-        </p>
-        <p>
-          本會全力推動及維護中小企業權益，面向全球助力各國政府優化投資及營商環境，加強本地與各國各級政府部門及領導官員的聯繫，凝聚業界，提升競爭力，共同拓展商機。
-        </p>
+        <h2>宗旨</h2>
+        {associationPurpose.map((item) => <p key={item}>{item}</p>)}
       </section>
       <section className="section mission-list">
-        <h2>本會使命</h2>
+        <h2>使命</h2>
         <div>
           {mission.map((item) => (
             <p key={item}>{item}</p>
           ))}
         </div>
       </section>
+    </>
+  );
+}
+
+function AboutPage({ navigate }) {
+  return (
+    <>
+      <PageHero {...pages["/about"]} imageUrl={image.meeting} />
+      <section className="section two-col">
+        <div>
+          <p className="kicker">協會簡介</p>
+          <h2>香港政府認可及支持的重要商會</h2>
+        </div>
+        <div className="rich-text">
+          {associationIntro.map((item) => <p key={item}>{item}</p>)}
+        </div>
+      </section>
+      <section className="section purpose">
+        <h2>本會宗旨</h2>
+        {associationPurpose.map((item) => <p key={item}>{item}</p>)}
+      </section>
+      <section className="section mission-list">
+        <h2>本會使命</h2>
+        <div>
+          {mission.map((item) => <p key={item}>{item}</p>)}
+        </div>
+      </section>
+      <section className="section two-col">
+        <div>
+          <p className="kicker">商會介紹</p>
+          <h2>建會27年，連接香港與全球中小企業</h2>
+        </div>
+        <div className="rich-text">
+          {associationStory.map((item) => <p key={item}>{item}</p>)}
+        </div>
+      </section>
+      <section className="section image-panel">
+        <div>
+          <h2>商会架構</h2>
+          <p>原站在關於商會頁中展示組織結構圖，用於說明商會治理與協作架構。</p>
+        </div>
+        <img src={image.structure} alt="香港中小企業工商聯合會組織結構圖" />
+      </section>
+      <section className="section directors-preview">
+        <div>
+          <p className="kicker">商會管理團隊</p>
+          <h2>聚集香港工商業各界優秀企業代表</h2>
+        </div>
+        <div className="director-row">
+          {managementTeam.map(([name, role], index) => (
+            <article key={name}>
+              <img src={image.directors[index % image.directors.length]} alt={name} />
+              <h3>{name}</h3>
+              <p>{role}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+      <NewsStrip navigate={navigate} />
     </>
   );
 }
@@ -463,7 +550,7 @@ function DirectorsPreview() {
         <h2>會董會與監察委員會</h2>
       </div>
       <div className="director-row">
-        {directors.slice(0, 5).map(([name, role], index) => (
+        {directors.map(([name, role], index) => (
           <article key={name}>
             <img src={image.directors[index % image.directors.length]} alt={name} />
             <h3>{name}</h3>
@@ -500,20 +587,24 @@ function ServicesPage() {
       <PageHero {...pages["/services"]} imageUrl={image.funding} />
       <section className="section two-col">
         <div>
-          <p className="kicker">商會服務</p>
-          <h2>協助企業升級，連接政府支援與全球市場</h2>
+          <p className="kicker">商會介紹</p>
+          <h2>紮根大中華，立足香港，服務全球中小企業</h2>
         </div>
         <div className="rich-text">
           <p>
-            港中聯成立於1998年，以「紮根大中華，立足香港，服務全球中小企業」為發展理念，擁有30多個行業委員會。
+            港中聯成立於1998年，以「紮根大中華，立足香港，服務全球中小企業」為發展理念，擁有30多個行業委員會。建會26年以來，港中聯在多個省市政府成功招商，幫助多家中小企業獲得發展機遇，完成事業升級，取得政府支持。
           </p>
-          <p>
-            本會擔當中小企業和政府的溝通橋樑，協助解決營商問題，拓展面對世界的商機，並推動企業社會責任。
-          </p>
+          {[
+            "作為全球化的堅定推動者，與世界各國政府、商協會、企業建立廣泛的關係，積極推動技術與環球市場發展。",
+            "向發展中國家的中小企業傳播香港與東亞新興工業國家的企業發展經驗。",
+            "擔當中小企業和政府的溝通橋樑和紐帶，協助解決中小企業的營商問題。",
+            "拓展中小企面對世界商機。協助政府招商引知，吸納人才。",
+            "推動企業社會責任，為全球經濟出謀獻策，有利中小企持續發展。凝聚各國商協會和企業的關係，創造共同價值。",
+          ].map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
       <section className="section fund-list">
-        <h2>政府中小企資助</h2>
+        <h2>了解更多政府中小企資助</h2>
         <div>
           {funds.map(([title, desc]) => (
             <article key={title}>
@@ -527,13 +618,17 @@ function ServicesPage() {
         <h2>常見問題</h2>
         <article>
           <h3>如何聯絡你們</h3>
-          <p>歡迎社會各界人士聯系我們。郵件：{contact.email}，電話：852 2330 0822。</p>
+          <p>歡迎社會各界人士聯系我們，我們的地址：九龍尖沙咀東部加連威老道94號明輝中心十二樓1210室，郵件：{contact.email}，電話：852 2330 0822。</p>
         </article>
         <article>
           <h3>企業怎麼加入商會</h3>
           <p>
-            港中聯新會員可透過官網進入事必簽電子簽約系統，完成線上資料填寫、認證、服務費支付與會員服務協議簽署。
+            港中联新会员的入会流程，过往是通过线上港中联的官网提交入會申请表、线下完成纸质协议签署并支付费用后才能成为会员。现通过事必签（SpeedGlobalSign）电子签约系统將会员入会的流程以线上的方式完成。
           </p>
+        </article>
+        <article>
+          <h3>法律声明及个人信息保护政策</h3>
+          <p>您的信任對我們非常重要，我們深知用戶信息安全的重要性，我們將按照法律法規要求，採取安全保護措施，保護您的個人信息安全可控。</p>
         </article>
       </section>
     </>
@@ -547,11 +642,15 @@ function IndustryPage() {
       <section className="section purpose">
         <h2>共建更繁榮、永續的行業環境</h2>
         <p>
-          在快速變化的商業世界中，行業委員會扮演著至關重要的角色。我們不僅是一個集體的聲音，更是推動行業進步、促進交流合作的橋樑。
+          在快速變化的商業世界中，行業委員會扮演著至關重要的角色。 我們不僅是一個集體的聲音，更是推動行業進步、促進交流合作的橋樑。 我們的使命是通過彙聚行業精英的智慧與力量，共同面對挑戰，把握機遇，塑造一個更加繁榮、永續的行業環境。
         </p>
-        <p>
-          我們的使命是通過彙聚行業精英的智慧與力量，共同面對挑戰，把握機遇，塑造一個更加繁榮、永續的行業環境。
-        </p>
+      </section>
+      <section className="section industry-icons" aria-label="行業委員會圖示">
+        {image.industryIcons.map((src, index) => (
+          <figure key={src}>
+            <img src={src} alt={`行業委員會圖示 ${index + 1}`} />
+          </figure>
+        ))}
       </section>
       <ContactPrompt />
     </>
@@ -618,6 +717,12 @@ function MemberServices({ navigate }) {
   return (
     <>
       <PageHero {...pages["/member-services"]} imageUrl={image.funding} />
+      <section className="section purpose">
+        <h2>Member services</h2>
+        <p>
+          原站會員服務頁作為會員相關入口頁，集中連到入會須知、會員服務協議、實名認證協議與信息保護政策。
+        </p>
+      </section>
       <section className="section service-links">
         {[
           ["/membership", "入會須知", "了解電子簽約入會流程、服務費及認證要求。"],
