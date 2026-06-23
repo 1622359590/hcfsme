@@ -1,5 +1,8 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
+import { gsap } from "gsap";
+import { useGSAP } from "@gsap/react";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
 import {
   ArrowRight,
   Buildings,
@@ -15,6 +18,8 @@ import {
   X,
 } from "@phosphor-icons/react";
 import "./styles.css";
+
+gsap.registerPlugin(useGSAP, ScrollTrigger);
 
 const image = {
   logo: "https://www.hcfsme.org/wp-content/uploads/2024/03/K3.png",
@@ -266,14 +271,107 @@ function useRoute() {
 function App() {
   const [path, navigate] = useRoute();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const appRef = useRef(null);
   const title = pages[path]?.title || pages["/"].title;
 
   useEffect(() => {
     document.title = `${title} | 香港中小企業工商聯合會`;
   }, [title]);
 
+  useGSAP(() => {
+    const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const animatedScope = appRef.current;
+
+    if (!animatedScope || reduceMotion) {
+      return;
+    }
+
+    gsap.defaults({ ease: "power3.out" });
+
+    const introTimeline = gsap.timeline({ defaults: { duration: 0.72 } });
+    introTimeline
+      .from(".site-header", { y: -18, autoAlpha: 0, duration: 0.42, clearProps: "all" })
+      .from(".hero-copy > *, .page-hero > div > *", {
+        y: 26,
+        autoAlpha: 0,
+        stagger: 0.075,
+        clearProps: "all",
+      }, "-=0.12")
+      .from(".hero-image, .page-hero img", {
+        y: 30,
+        scale: 0.975,
+        autoAlpha: 0,
+        duration: 0.86,
+        clearProps: "all",
+      }, "-=0.42")
+      .from(".intro-band > div", {
+        y: 24,
+        autoAlpha: 0,
+        stagger: 0.08,
+        duration: 0.55,
+        clearProps: "all",
+      }, "-=0.32");
+
+    ScrollTrigger.batch(".section", {
+      start: "top 84%",
+      once: true,
+      interval: 0.08,
+      batchMax: 3,
+      onEnter: (batch) => {
+        gsap.fromTo(batch, { autoAlpha: 0, y: 42 }, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.78,
+          stagger: 0.08,
+          overwrite: true,
+          clearProps: "all",
+        });
+      },
+    });
+
+    ScrollTrigger.batch(
+      ".support-card, .director-row article, .director-grid article, .news-row article, .news-grid article, .service-links button, .fund-list article, .offices article, .legal article, .steps article, .industry-icons figure",
+      {
+        start: "top 88%",
+        once: true,
+        interval: 0.06,
+        batchMax: 6,
+        onEnter: (batch) => {
+          gsap.fromTo(batch, { autoAlpha: 0, y: 28, scale: 0.985 }, {
+            autoAlpha: 1,
+            y: 0,
+            scale: 1,
+            duration: 0.62,
+            stagger: { each: 0.045, from: "start" },
+            overwrite: true,
+            clearProps: "all",
+          });
+        },
+      },
+    );
+
+    gsap.utils.toArray(".hero-image img, .page-hero img, .gallery img").forEach((target) => {
+      gsap.to(target, {
+        yPercent: -5,
+        ease: "none",
+        scrollTrigger: {
+          trigger: target,
+          start: "top bottom",
+          end: "bottom top",
+          scrub: 1,
+        },
+      });
+    });
+
+    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 180);
+
+    return () => {
+      window.clearTimeout(refreshTimer);
+    };
+  }, { dependencies: [path], scope: appRef, revertOnUpdate: true });
+
   return (
-    <div>
+    <div ref={appRef}>
       <Header path={path} navigate={navigate} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
       <main>
         <RenderPage path={path} navigate={navigate} />
