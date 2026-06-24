@@ -98,11 +98,11 @@ const nav = [
     label: "商會服務",
     path: "/services",
     children: [
-      { label: "政府資助申請輔導", path: "/services" },
-      { label: "行業委員會與交流平台", path: "/services" },
-      { label: "大灣區商務對接", path: "/services" },
-      { label: "企業培訓與研討會", path: "/services" },
-      { label: "廠商資源對接", path: "/services" },
+      { label: "政府資助申請輔導", path: "/services#service-1" },
+      { label: "行業委員會與交流平台", path: "/services#service-2" },
+      { label: "大灣區商務對接", path: "/services#service-3" },
+      { label: "企業培訓與研討會", path: "/services#service-4" },
+      { label: "廠商資源對接", path: "/services#service-5" },
     ],
   },
   {
@@ -398,20 +398,34 @@ function normalizePath(path) {
   return pages[path] ? path : "/";
 }
 
+function parseRoute(value = `${window.location.pathname}${window.location.hash}`) {
+  const [rawPath, rawHash = ""] = value.split("#");
+  const path = normalizePath(rawPath);
+  return { path, hash: rawHash ? `#${rawHash}` : "" };
+}
+
 function useRoute() {
-  const [path, setPath] = useState(normalizePath(window.location.pathname));
+  const [route, setRoute] = useState(() => parseRoute());
   useEffect(() => {
-    const onPop = () => setPath(normalizePath(window.location.pathname));
+    const onPop = () => setRoute(parseRoute());
     window.addEventListener("popstate", onPop);
     return () => window.removeEventListener("popstate", onPop);
   }, []);
   const navigate = (next) => {
-    const safe = normalizePath(next);
-    window.history.pushState({}, "", safe);
-    setPath(safe);
-    window.scrollTo({ top: 0, behavior: "smooth" });
+    const safe = parseRoute(next);
+    const href = `${safe.path}${safe.hash}`;
+    window.history.pushState({}, "", href);
+    setRoute(safe);
+    window.setTimeout(() => {
+      if (safe.hash) {
+        const target = document.querySelector(safe.hash);
+        target?.scrollIntoView({ behavior: "smooth", block: "start" });
+        return;
+      }
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }, 0);
   };
-  return [path, navigate];
+  return [route.path, navigate];
 }
 
 function App() {
@@ -423,6 +437,14 @@ function App() {
   useEffect(() => {
     document.title = `${title} | 香港中小企業工商聯合會`;
   }, [title]);
+
+  useEffect(() => {
+    if (!window.location.hash) return;
+    const timer = window.setTimeout(() => {
+      document.querySelector(window.location.hash)?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }, 80);
+    return () => window.clearTimeout(timer);
+  }, [path]);
 
   useGSAP(() => {
     const reduceMotion = window.matchMedia("(prefers-reduced-motion: reduce)").matches;

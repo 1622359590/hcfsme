@@ -845,6 +845,7 @@ h3 {
 
 .service-panel {
   padding: clamp(28px, 4vw, 48px);
+  scroll-margin-top: 128px;
 }
 
 .service-panel-head {
