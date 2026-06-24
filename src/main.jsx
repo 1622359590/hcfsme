@@ -1680,7 +1680,12 @@ function AdminPage({ navigate }) {
       settingsTab: "全站設定",
       applicationsTab: "入會記錄",
       pageContent: "頁面內容",
-      pageContentHelp: "選擇頁面後，可修改首屏標題、副標題、頭圖，並添加頁面內容區塊。",
+      pageContentHelp: "選擇頁面後，可直接修改該頁首屏與前台正在顯示的內容。",
+      frontPageContent: "前台內容",
+      frontPageContentHelp: "這裡是目前前台頁面正在使用的資料，可直接修改並保存。",
+      noPageSpecificContent: "此頁暫無獨立內容模組，可使用下方內容區塊新增展示內容。",
+      customBlocks: "附加內容區塊",
+      customBlocksHelp: "這些區塊會追加在頁面既有內容之後，適合放補充說明、活動亮點或圖片。",
       siteSettings: "全站設定",
       siteSettingsHelp: "維護聯絡方式、商會服務、會員權益與資源下載入口。",
       saveContent: "保存內容",
@@ -1760,7 +1765,12 @@ function AdminPage({ navigate }) {
       settingsTab: "Site settings",
       applicationsTab: "Applications",
       pageContent: "Page content",
-      pageContentHelp: "Select a page to edit its hero title, subtitle, image, and add content blocks.",
+      pageContentHelp: "Select a page to edit its hero and the content currently shown on the frontend.",
+      frontPageContent: "Frontend content",
+      frontPageContentHelp: "This is the data currently used by the frontend page. Edit and save directly.",
+      noPageSpecificContent: "This page has no dedicated content module yet. Use content blocks below to add display content.",
+      customBlocks: "Additional content blocks",
+      customBlocksHelp: "These blocks appear after the page's existing content. Use them for extra notes, highlights, or images.",
       siteSettings: "Site settings",
       siteSettingsHelp: "Maintain contact info, services, member benefits, and download links.",
       saveContent: "Save content",
@@ -2090,6 +2100,177 @@ function AdminPage({ navigate }) {
     }));
   };
 
+  const renderAboutEditor = () => (
+    <div className="field-grid">
+      {["associationIntro", "associationPurpose", "mission", "associationStory"].map((key) => (
+        <label key={key} className="full">{t[key]}
+          <textarea
+            rows={5}
+            value={contentForm.aboutContent?.[key] || ""}
+            onChange={(event) => updateContent((current) => ({
+              ...current,
+              aboutContent: { ...current.aboutContent, [key]: event.target.value },
+            }))}
+          />
+        </label>
+      ))}
+    </div>
+  );
+
+  const renderPeopleEditor = (key, label) => (
+    <div className="module-editor">
+      <div className="module-head">
+        <div>
+          <h3>{label}</h3>
+          <p>{t.frontPageContentHelp}</p>
+        </div>
+        <button className="text-button" onClick={() => addPerson(key)}>{t.addPerson}</button>
+      </div>
+      <div className="people-editor">
+        {(contentForm[key] || []).map((person, index) => (
+          <article key={`${key}-${person.name}-${index}`}>
+            <div className="person-preview">
+              <img src={person.imageUrl || image.directors[index % image.directors.length]} alt="" />
+            </div>
+            <div className="field-grid">
+              <label>{t.personName}<input value={person.name || ""} onChange={(event) => updatePerson(key, index, { name: event.target.value })} /></label>
+              <label>{t.personRole}<input value={person.role || ""} onChange={(event) => updatePerson(key, index, { role: event.target.value })} /></label>
+              <label className="full">{t.personImage}<input value={person.imageUrl || ""} onChange={(event) => updatePerson(key, index, { imageUrl: event.target.value })} placeholder="https://..." /></label>
+              <label className="upload-button">
+                {t.uploadImage}
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePerson(key, index, { imageUrl: url }))} />
+              </label>
+              <button className="text-button danger" onClick={() => removePerson(key, index)}>{t.removePerson}</button>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderServicesEditor = () => (
+    <div className="module-editor">
+      <div className="module-head">
+        <div>
+          <h3>{t.serviceSettings}</h3>
+          <p>{t.frontPageContentHelp}</p>
+        </div>
+        <button className="text-button" onClick={addService}>{t.addService}</button>
+      </div>
+      <div className="nested-list">
+        {(contentForm.coreServices || []).map((service, index) => (
+          <article key={`${service.title}-${index}`}>
+            <div className="admin-panel-head">
+              <h4>{service.title || `${t.serviceSettings} ${index + 1}`}</h4>
+              <button className="text-button danger" onClick={() => removeService(index)}>{t.removeService}</button>
+            </div>
+            <div className="field-grid">
+              <label>{t.title}<input value={service.title || ""} onChange={(event) => updateService(index, { title: event.target.value })} /></label>
+              <label>{t.serviceValue}<input value={service.value || ""} onChange={(event) => updateService(index, { value: event.target.value })} /></label>
+              <label className="full">{t.serviceItems}
+                <textarea
+                  rows={5}
+                  value={(service.items || []).map(([itemTitle, itemDesc]) => `${itemTitle || ""}｜${itemDesc || ""}`).join("\n")}
+                  onChange={(event) => updateService(index, {
+                    items: event.target.value.split("\n").map((line) => {
+                      const [itemTitle = "", itemDesc = ""] = line.split("｜");
+                      return [itemTitle.trim(), itemDesc.trim()];
+                    }).filter(([itemTitle, itemDesc]) => itemTitle || itemDesc),
+                  })}
+                />
+              </label>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderPairListEditor = (key, label, withUrl = false) => (
+    <div className="module-editor">
+      <div className="module-head">
+        <div>
+          <h3>{label}</h3>
+          <p>{t.frontPageContentHelp}</p>
+        </div>
+        <button className="text-button" onClick={() => addPairListItem(key, withUrl ? ["", "", "/"] : ["", ""])}>{t.addItem}</button>
+      </div>
+      <div className="nested-list compact">
+        {(contentForm[key] || []).map((item, index) => (
+          <article key={`${key}-${item[0]}-${index}`}>
+            <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList(key, index, 0, event.target.value)} /></label>
+            <label>{t.summary}<textarea rows={3} value={item[1] || ""} onChange={(event) => updatePairList(key, index, 1, event.target.value)} /></label>
+            {withUrl ? <label>URL<input value={item[2] || ""} onChange={(event) => updatePairList(key, index, 2, event.target.value)} /></label> : null}
+            <button className="text-button danger" onClick={() => removePairListItem(key, index)}>{t.delete}</button>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+
+  const renderContactEditor = () => (
+    <div className="field-grid single">
+      {["phone", "email", "addressZh", "addressEn"].map((key) => (
+        <label key={key}>{t[key]}<input value={contentForm.contact?.[key] || ""} onChange={(event) => updateContent((current) => ({ ...current, contact: { ...current.contact, [key]: event.target.value } }))} /></label>
+      ))}
+    </div>
+  );
+
+  const renderPageSpecificEditor = () => {
+    if (selectedPage === "/about") {
+      return (
+        <>
+          <section className="module-editor">
+            <div className="module-head">
+              <div>
+                <h3>{t.aboutSettings}</h3>
+                <p>{t.frontPageContentHelp}</p>
+              </div>
+            </div>
+            {renderAboutEditor()}
+          </section>
+          {renderPeopleEditor("managementProfiles", t.managementSettings)}
+        </>
+      );
+    }
+    if (selectedPage === "/intro") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.aboutSettings}</h3>
+              <p>{t.frontPageContentHelp}</p>
+            </div>
+          </div>
+          {renderAboutEditor()}
+        </section>
+      );
+    }
+    if (selectedPage === "/directors") return renderPeopleEditor("directorProfiles", t.directorsSettings);
+    if (selectedPage === "/services") return renderServicesEditor();
+    if (selectedPage === "/member-benefits") return renderPairListEditor("memberBenefits", t.benefitsSettings);
+    if (selectedPage === "/downloads") return renderPairListEditor("downloads", t.downloadsSettings, true);
+    if (selectedPage === "/contact") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.contactSettings}</h3>
+              <p>{t.frontPageContentHelp}</p>
+            </div>
+          </div>
+          {renderContactEditor()}
+        </section>
+      );
+    }
+    return (
+      <section className="module-empty">
+        <h3>{t.frontPageContent}</h3>
+        <p>{t.noPageSpecificContent}</p>
+      </section>
+    );
+  };
+
   const logout = () => {
     localStorage.removeItem("hcfsme_admin_token");
     setToken("");
@@ -2187,8 +2368,8 @@ function AdminPage({ navigate }) {
       ) : null}
 
       {activeTab === "pages" ? (
-        <section className="admin-panel content-panel">
-          <div className="admin-panel-head">
+        <section className="content-panel content-workspace">
+          <div className="workspace-head">
             <div>
               <h2>{t.pageContent}</h2>
               <p>{t.pageContentHelp}</p>
@@ -2211,17 +2392,38 @@ function AdminPage({ navigate }) {
             </aside>
 
             <div className="content-editor-main">
-              <div className="field-grid">
-                <label>{t.heroTitle}<input value={contentForm.pages[selectedPage]?.title || ""} onChange={(event) => updatePage(selectedPage, { title: event.target.value })} /></label>
-                <label>{t.heroSubtitle}<input value={contentForm.pages[selectedPage]?.subtitle || ""} onChange={(event) => updatePage(selectedPage, { subtitle: event.target.value })} /></label>
-                <label className="full">{t.heroImage}<input value={contentForm.pages[selectedPage]?.imageUrl || ""} onChange={(event) => updatePage(selectedPage, { imageUrl: event.target.value })} placeholder="https://..." /></label>
-                <label className="upload-button">
-                  {t.uploadImage}
-                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePage(selectedPage, { imageUrl: url }))} />
-                </label>
-              </div>
+              <section className="page-module-stack">
+                <div className="section-subhead">
+                  <h3>{t.frontPageContent}</h3>
+                  <p>{t.frontPageContentHelp}</p>
+                </div>
+                {renderPageSpecificEditor()}
+              </section>
+
+              <section className="module-editor hero-editor">
+                <div className="module-head">
+                  <div>
+                    <span className="module-chip">{pageNames[selectedPage]}</span>
+                    <h3>{contentForm.pages[selectedPage]?.title || pageNames[selectedPage]}</h3>
+                    <p>{selectedPage}</p>
+                  </div>
+                </div>
+                <div className="field-grid">
+                  <label>{t.heroTitle}<input value={contentForm.pages[selectedPage]?.title || ""} onChange={(event) => updatePage(selectedPage, { title: event.target.value })} /></label>
+                  <label>{t.heroSubtitle}<input value={contentForm.pages[selectedPage]?.subtitle || ""} onChange={(event) => updatePage(selectedPage, { subtitle: event.target.value })} /></label>
+                  <label className="full">{t.heroImage}<input value={contentForm.pages[selectedPage]?.imageUrl || ""} onChange={(event) => updatePage(selectedPage, { imageUrl: event.target.value })} placeholder="https://..." /></label>
+                  <label className="upload-button">
+                    {t.uploadImage}
+                    <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePage(selectedPage, { imageUrl: url }))} />
+                  </label>
+                </div>
+              </section>
 
               <div className="block-list">
+                <div className="section-subhead">
+                  <h3>{t.customBlocks}</h3>
+                  <p>{t.customBlocksHelp}</p>
+                </div>
                 {(contentForm.pages[selectedPage]?.blocks || []).map((block, index) => (
                   <article className="content-block-editor" key={`${selectedPage}-${index}`}>
                     <div className="admin-panel-head">

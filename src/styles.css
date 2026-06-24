@@ -1229,9 +1229,26 @@ h3 {
   margin: 18px auto 0;
 }
 
+.content-workspace {
+  padding: 0;
+}
+
+.workspace-head,
 .content-panel .admin-panel-head {
   align-items: start;
   margin-bottom: 18px;
+}
+
+.workspace-head {
+  padding: 28px 30px;
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 72%, transparent), transparent 58%),
+    var(--surface);
 }
 
 .content-panel .admin-panel-head p {
@@ -1239,6 +1256,18 @@ h3 {
   margin: 8px 0 0;
   color: var(--muted);
   line-height: 1.7;
+}
+
+.workspace-head h2 {
+  font-size: 40px;
+}
+
+.workspace-head p,
+.module-head p,
+.section-subhead p,
+.module-empty p {
+  color: var(--muted);
+  line-height: 1.65;
 }
 
 .content-panel textarea {
@@ -1257,17 +1286,22 @@ h3 {
 
 .content-editor {
   display: grid;
-  grid-template-columns: 260px minmax(0, 1fr);
-  gap: 22px;
+  grid-template-columns: 276px minmax(0, 1fr);
+  gap: 18px;
   align-items: start;
+  margin-top: 18px;
 }
 
 .page-list {
   display: grid;
-  gap: 8px;
+  gap: 10px;
   align-content: start;
   position: sticky;
   top: 132px;
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
 }
 
 .page-list label,
@@ -1281,12 +1315,18 @@ h3 {
 }
 
 .page-list button {
-  padding: 12px 14px;
+  padding: 13px 14px;
   border: 1px solid var(--line);
-  border-radius: 12px;
+  border-radius: 10px;
   background: var(--bg);
   color: var(--text);
   text-align: left;
+  transition: border-color 160ms var(--ease-out), background 160ms var(--ease-out), transform 160ms var(--ease-out);
+}
+
+.page-list button:hover {
+  border-color: color-mix(in srgb, var(--accent) 28%, var(--line));
+  transform: translateX(2px);
 }
 
 .page-list button span,
@@ -1307,10 +1347,18 @@ h3 {
 
 .content-editor-main,
 .block-list,
-.nested-list {
+.nested-list,
+.page-module-stack {
   display: grid;
   gap: 16px;
   align-content: start;
+}
+
+.content-editor-main {
+  padding: 18px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: var(--surface);
 }
 
 .field-grid {
@@ -1330,11 +1378,63 @@ h3 {
 
 .content-block-editor,
 .settings-card,
-.nested-list article {
+.nested-list article,
+.module-editor,
+.module-empty {
   padding: 20px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--bg) 64%, var(--surface));
+}
+
+.module-editor {
+  display: grid;
+  gap: 16px;
+}
+
+.hero-editor {
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 62%, transparent), transparent 48%),
+    color-mix(in srgb, var(--bg) 64%, var(--surface));
+}
+
+.module-head,
+.section-subhead {
+  display: flex;
+  align-items: start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.module-head h3,
+.section-subhead h3,
+.module-empty h3 {
+  font-size: 24px;
+}
+
+.module-head p,
+.section-subhead p,
+.module-empty p {
+  margin: 6px 0 0;
+}
+
+.module-chip {
+  width: fit-content;
+  display: inline-flex;
+  align-items: center;
+  min-height: 28px;
+  padding: 0 10px;
+  margin-bottom: 10px;
+  border-radius: 999px;
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-size: 13px;
+  font-weight: 800;
+}
+
+.module-empty {
+  background: transparent;
+  border-style: dashed;
 }
 
 .settings-grid {
@@ -1374,8 +1474,16 @@ h3 {
   align-items: start;
   padding: 18px;
   border: 1px solid var(--line);
-  border-radius: 16px;
+  border-radius: 12px;
   background: color-mix(in srgb, var(--bg) 64%, var(--surface));
+}
+
+.page-module-stack .people-editor {
+  grid-template-columns: 1fr;
+}
+
+.page-module-stack .people-editor article {
+  grid-template-columns: 148px minmax(0, 1fr);
 }
 
 .person-preview {
@@ -1980,6 +2088,15 @@ h3 {
 
   .content-panel {
     padding: 20px;
+  }
+
+  .content-workspace {
+    padding: 0;
+  }
+
+  .workspace-head {
+    padding: 22px;
+    flex-direction: column;
   }
 
   .people-editor article {
