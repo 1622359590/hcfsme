@@ -1169,7 +1169,7 @@ function MembershipPage() {
 function ApplicationPage() {
   return (
     <>
-      <PageHero {...pages["/application"]} imageUrl={image.gallery[1]} />
+      <PageHero {...pages["/application"]} imageUrl={image.meeting} />
       <section className="section application-panel">
         <div>
           <h2>預登記資料</h2>
