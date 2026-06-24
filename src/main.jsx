@@ -75,6 +75,13 @@ const image = {
   ],
 };
 
+function getFallback(arr, index, defaultArr) {
+  if (arr && arr.length > 0 && arr[index]) return arr[index];
+  if (defaultArr && defaultArr.length > 0) return defaultArr[index % defaultArr.length];
+  return "";
+}
+
+
 const contact = {
   phone: "+852 2331 7979",
   email: "info@hcfsme.org",
@@ -313,13 +320,13 @@ const managementTeam = [
 const defaultDirectorProfiles = directors.map(([name, role], index) => ({
   name,
   role,
-  imageUrl: image.directors[index % image.directors.length],
+  imageUrl: getFallback(image.directors, index, image.directors),
 }));
 
 const defaultManagementProfiles = managementTeam.map(([name, role], index) => ({
   name,
   role,
-  imageUrl: image.directors[index % image.directors.length],
+  imageUrl: getFallback(image.directors, index, image.directors),
 }));
 
 const defaultAboutContent = {
@@ -599,6 +606,7 @@ function mergeEditableContent(input = {}) {
   return {
     ...defaultEditableContent,
     ...input,
+    siteIcon: input.siteIcon || '',
     contact: { ...contact, ...(input.contact || {}) },
     coreServices: Array.isArray(input.coreServices) ? input.coreServices : coreServices,
     activities: Array.isArray(input.activities) ? input.activities : defaultActivities,
@@ -612,6 +620,12 @@ function mergeEditableContent(input = {}) {
     resourceLinks: Array.isArray(input.resourceLinks) ? input.resourceLinks : defaultResourceLinks,
     memberBenefits: Array.isArray(input.memberBenefits) ? input.memberBenefits : memberBenefits,
     downloads: Array.isArray(input.downloads) ? input.downloads : downloads,
+    charterSections: Array.isArray(input.charterSections) ? input.charterSections : [],
+    agreementSections: Array.isArray(input.agreementSections) ? input.agreementSections : [],
+    certificationSections: Array.isArray(input.certificationSections) ? input.certificationSections : [],
+    protectionSections: Array.isArray(input.protectionSections) ? input.protectionSections : [],
+    announcements: Array.isArray(input.announcements) ? input.announcements : [],
+    galleryImages: Array.isArray(input.galleryImages) ? input.galleryImages : [],
     directorProfiles: Array.isArray(input.directorProfiles) ? input.directorProfiles : defaultDirectorProfiles,
     managementProfiles: Array.isArray(input.managementProfiles) ? input.managementProfiles : defaultManagementProfiles,
     aboutContent: { ...defaultAboutContent, ...(input.aboutContent || {}) },
@@ -672,6 +686,14 @@ function App() {
   useEffect(() => {
     document.title = `${title} | 香港中小企業工商聯合會`;
   }, [title]);
+
+  useEffect(() => {
+    const fav = content.siteIcon || content.contact?.siteIcon || "";
+    if (fav) {
+      const link = document.getElementById("favicon");
+      if (link) link.href = fav;
+    }
+  }, [content]);
 
   useEffect(() => {
     if (!window.location.hash) return;
@@ -846,7 +868,7 @@ function App() {
       });
     });
 
-    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 180);
+    const refreshTimer = window.setTimeout(() => ScrollTrigger.refresh(), 300);
 
     return () => {
       window.clearTimeout(refreshTimer);
@@ -934,7 +956,7 @@ function RenderPage({ path, navigate, content, siteContact }) {
   if (path === "/member-benefits") page = <MemberBenefitsPage content={content} />;
   if (path === "/membership") page = <MembershipPage content={content} />;
   if (path === "/application") page = <ApplicationPage />;
-  if (["/agreement", "/certification", "/protection"].includes(path)) page = <LegalPage data={pages[path]} />;
+  if (["/agreement", "/certification", "/protection"].includes(path)) page = <LegalPage data={{...pages[path], path}} content={content} />;
   if (path === "/resources") page = <ResourcesPage navigate={navigate} content={content} />;
   if (path === "/announcements") page = <AnnouncementsPage />;
   if (path === "/downloads") page = <DownloadsPage navigate={navigate} content={content} />;
@@ -1172,7 +1194,7 @@ function AboutPage({ navigate }) {
         <div className="director-row">
           {managementProfiles.map((person, index) => (
             <article key={`${person.name}-${index}`}>
-              <img src={person.imageUrl || image.directors[index % image.directors.length]} alt={person.name} />
+              <img src={person.imageUrl || getFallback(image.directors, index, image.directors)} alt={person.name} />
               <h3>{person.name}</h3>
               <p>{person.role}</p>
             </article>
@@ -1233,6 +1255,8 @@ function StructurePage({ content }) {
 }
 
 function CharterPage() {
+  const ctx = useContext(ContentContext) || defaultEditableContent;
+  const sections = ctx.charterSections && ctx.charterSections.length > 0 ? ctx.charterSections : charterSections;
   return (
     <>
       <PageHero {...pages["/charter"]} imageUrl={image.side} />
@@ -1247,7 +1271,7 @@ function CharterPage() {
         </div>
       </section>
       <section className="section legal charter-grid">
-        {charterSections.map(([title, body]) => (
+        {sections.map(([title, body]) => (
           <article key={title}>
             <h2>{title}</h2>
             <p>{body}</p>
@@ -1270,7 +1294,7 @@ function DirectorsPreview() {
       <div className="director-row">
         {directorItems.map((person, index) => (
           <article key={`${person.name}-${index}`}>
-            <img src={person.imageUrl || image.directors[index % image.directors.length]} alt={person.name} />
+            <img src={person.imageUrl || getFallback(image.directors, index, image.directors)} alt={person.name} />
             <h3>{person.name}</h3>
             <p>{person.role}</p>
           </article>
@@ -1289,7 +1313,7 @@ function DirectorsPage() {
       <section className="section director-grid">
         {directorItems.map((person, index) => (
           <article key={`${person.name}-${index}`}>
-            <img src={person.imageUrl || image.directors[index % image.directors.length]} alt={person.name} />
+            <img src={person.imageUrl || getFallback(image.directors, index, image.directors)} alt={person.name} />
             <div>
               <h2>{person.name}</h2>
               <p>{person.role}</p>
@@ -1439,7 +1463,7 @@ function NewsPage() {
       <section className="section news-grid">
         {items.map((item, index) => (
           <article key={item.title}>
-            <img src={item.image || image.news[index % image.news.length]} alt={`${item.title} 活動圖片`} />
+            <img src={item.image || getFallback(image.news, index, image.news)} alt={`${item.title} 活動圖片`} />
             <div>
               <span><CalendarBlank size={16} /> {item.date}</span>
               <h2>{item.title}</h2>
@@ -1454,12 +1478,14 @@ function NewsPage() {
 }
 
 function PhotoPage() {
+  const ctx = useContext(ContentContext) || defaultEditableContent;
+  const images = ctx.galleryImages && ctx.galleryImages.length > 0 ? ctx.galleryImages : image.gallery;
   return (
     <>
-      <PageHero {...pages["/photo"]} imageUrl={image.gallery[0]} />
+      <PageHero {...pages["/photo"]} imageUrl={images[0] || image.gallery[0]} />
       <section className="section gallery">
-        {image.gallery.map((src, index) => (
-          <figure key={src} className={index === 0 || index === 4 ? "wide" : ""}>
+        {images.map((src, index) => (
+          <figure key={src + index} className={images.length > 4 && (index === 0 || index === 4) ? "wide" : ""}>
             <img src={src} alt={`商會相冊 ${index + 1}`} />
           </figure>
         ))}
@@ -1477,7 +1503,7 @@ function ActivitiesPage({ navigate, content }) {
       <section className="section activity-grid">
         {activityItems.map((item, index) => (
           <article key={`${item.title || "activity"}-${index}`}>
-            <img src={item.imageUrl || image.news[index % image.news.length]} alt={`${item.title || "商會活動"} 活動圖片`} />
+            <img src={item.imageUrl || getFallback(image.news, index, image.news)} alt={`${item.title || "商會活動"} 活動圖片`} />
             <div>
               <h2>{item.title}</h2>
               <p>{item.summary}</p>
@@ -1614,13 +1640,16 @@ function ApplicationPage() {
   );
 }
 
-function LegalPage({ data }) {
+function LegalPage({ data, content }) {
+  const ctx = content || defaultEditableContent;
+  const key = data.path ? data.path.replace("/", "") + "Sections" : "";
+  const sections = (ctx[key] && ctx[key].length > 0) ? ctx[key] : (data.sections || []);
   return (
     <>
       <PageHero title={data.title} subtitle={data.intro} imageUrl={image.gallery[4]} />
       <section className="section legal">
         <p className="legal-intro">{data.intro}</p>
-        {data.sections.map(([title, body]) => (
+        {sections.map(([title, body]) => (
           <article key={title}>
             <h2>{title}</h2>
             <p>{body}</p>
@@ -1651,15 +1680,17 @@ function ResourcesPage({ navigate, content }) {
 }
 
 function AnnouncementsPage() {
+  const ctx = useContext(ContentContext) || defaultEditableContent;
+  const items = ctx.announcements && ctx.announcements.length > 0 ? ctx.announcements : [
+    ["入會公示", "後續可在此發布新會員公示、會籍變更及除名通知。"],
+    ["會議通知", "後續可發布會員大會、會董會、監事委員會及行業委員會會議安排。"],
+    ["會務公告", "後續可發布秘書處通知、服務調整、活動報名與下載資料更新。"],
+  ];
   return (
     <>
       <PageHero {...pages["/announcements"]} imageUrl={image.side} />
       <section className="section legal">
-        {[
-          ["入會公示", "後續可在此發布新會員公示、會籍變更及除名通知。"],
-          ["會議通知", "後續可發布會員大會、會董會、監事委員會及行業委員會會議安排。"],
-          ["會務公告", "後續可發布秘書處通知、服務調整、活動報名與下載資料更新。"],
-        ].map(([title, body]) => (
+        {items.map(([title, body]) => (
           <article key={title}>
             <h2>{title}</h2>
             <p>{body}</p>
@@ -1784,6 +1815,19 @@ function AdminPage({ navigate }) {
       frontPageContent: "前台內容",
       frontPageContentHelp: "這裡是目前前台頁面正在使用的資料，可直接修改並保存。",
       noPageSpecificContent: "此頁暫無獨立內容模組，可使用下方內容區塊新增展示內容。",
+      charterEditor: "章程內容編輯",
+      charterEditorHelp: "編輯商會章程各章節內容。",
+      agreementEditor: "會員服務協議編輯",
+      certificationEditor: "實名認證協議編輯",
+      protectionEditor: "資訊保護政策編輯",
+      legalEditorHelp: "編輯協議/政策條款內容。標題與正文請用 || 分隔，每行一條。",
+      announcementsEditor: "公告管理",
+      announcementsEditorHelp: "管理前台公告列表。標題與正文請用 || 分隔。",
+      photoEditor: "相冊管理",
+      photoEditorHelp: "管理商會相冊圖片。",
+      addAnnouncement: "新增公告",
+      addPhoto: "新增圖片",
+      photoUrl: "圖片網址",
       customBlocks: "附加內容區塊",
       customBlocksHelp: "這些區塊會追加在頁面既有內容之後，適合放補充說明、活動亮點或圖片。",
       siteSettings: "全站設定",
@@ -1852,6 +1896,7 @@ function AdminPage({ navigate }) {
       loginOk: "登入成功",
       newsCreated: "新聞已新增",
       newsUpdated: "新聞已更新",
+      confirmDelete: "確定要刪除嗎？此操作不可恢復。",
       newsDeleted: "新聞已刪除",
       contentSaved: "網站內容已保存",
       uploadOk: "圖片已上傳並填入圖片欄位",
@@ -1890,6 +1935,19 @@ function AdminPage({ navigate }) {
       frontPageContent: "Frontend content",
       frontPageContentHelp: "This is the data currently used by the frontend page. Edit and save directly.",
       noPageSpecificContent: "This page has no dedicated content module yet. Use content blocks below to add display content.",
+      charterEditor: "Charter Editor",
+      charterEditorHelp: "Edit charter sections. Use || to separate title and body, one per line.",
+      agreementEditor: "Member Service Agreement Editor",
+      certificationEditor: "Certification Agreement Editor",
+      protectionEditor: "Privacy Policy Editor",
+      legalEditorHelp: "Edit terms. Separate title and body with ||, one per line.",
+      announcementsEditor: "Announcements",
+      announcementsEditorHelp: "Manage announcement list. Use || to separate title and body.",
+      photoEditor: "Photo Gallery",
+      photoEditorHelp: "Manage gallery images.",
+      addAnnouncement: "Add Announcement",
+      addPhoto: "Add Image",
+      photoUrl: "Image URL",
       customBlocks: "Additional content blocks",
       customBlocksHelp: "These blocks appear after the page's existing content. Use them for extra notes, highlights, or images.",
       siteSettings: "Site settings",
@@ -1958,6 +2016,7 @@ function AdminPage({ navigate }) {
       loginOk: "Logged in",
       newsCreated: "News created",
       newsUpdated: "News updated",
+      confirmDelete: "Are you sure you want to delete? This cannot be undone.",
       newsDeleted: "News deleted",
       contentSaved: "Site content saved",
       uploadOk: "Image uploaded and inserted",
@@ -1972,10 +2031,12 @@ function AdminPage({ navigate }) {
   const [contentForm, setContentForm] = useState(defaultEditableContent);
   const [activeTab, setActiveTab] = useState("news");
   const [selectedPage, setSelectedPage] = useState("/");
+  const [openGroups, setOpenGroups] = useState([]);
   const [draft, setDraft] = useState(emptyNews);
   const [editingId, setEditingId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [previewOpen, setPreviewOpen] = useState(false);
   const t = copy[lang] || copy.zh;
 
   const switchLang = () => {
@@ -2012,6 +2073,24 @@ function AdminPage({ navigate }) {
   useEffect(() => {
     loadAdminData();
   }, [token]);
+
+  useEffect(() => {
+    const pageToGroup = {
+      "/": "首頁",
+      "/about": "關於港中聯", "/intro": "關於港中聯", "/charter": "關於港中聯",
+      "/structure": "關於港中聯", "/directors": "關於港中聯", "/industry": "關於港中聯",
+      "/contact": "關於港中聯",
+      "/services": "商會服務",
+      "/activities": "商會活動", "/news": "商會活動", "/photo": "商會活動",
+      "/member-services": "會員服務", "/member-benefits": "會員服務", "/membership": "會員服務",
+      "/application": "會員服務", "/agreement": "會員服務", "/certification": "會員服務", "/protection": "會員服務",
+      "/resources": "資訊與資源", "/announcements": "資訊與資源", "/downloads": "資訊與資源", "/subscribe": "資訊與資源",
+    };
+    const group = pageToGroup[selectedPage];
+    if (group && !openGroups.includes(group)) {
+      setOpenGroups((prev) => [...new Set([...prev, group])]);
+    }
+  }, [selectedPage]);
 
   const login = async (event) => {
     event.preventDefault();
@@ -2052,6 +2131,7 @@ function AdminPage({ navigate }) {
           body: JSON.stringify(draft),
         });
         setMessage(t.newsCreated);
+        window.setTimeout(() => setMessage(""), 3000);
       }
       setDraft(emptyNews);
       setEditingId("");
@@ -2067,10 +2147,12 @@ function AdminPage({ navigate }) {
   };
 
   const deleteNews = async (id) => {
+    if (!window.confirm(t.confirmDelete)) return;
     setMessage("");
     try {
       await apiRequest(`/api/admin/news/${id}`, { method: "DELETE", token });
       setMessage(t.newsDeleted);
+      window.setTimeout(() => setMessage(""), 3000);
       await loadAdminData();
     } catch (error) {
       setMessage(error.message || "刪除失敗");
@@ -2087,8 +2169,10 @@ function AdminPage({ navigate }) {
       });
       setMessage(t.contentSaved);
       await loadAdminData();
+      window.setTimeout(() => setMessage((prev) => prev === t.contentSaved ? "" : prev), 3000);
     } catch (error) {
       setMessage(error.message || "內容保存失敗");
+      window.setTimeout(() => setMessage(""), 4000);
     }
   };
 
@@ -2244,6 +2328,25 @@ function AdminPage({ navigate }) {
     });
   };
 
+  const addArrayItem = (key, emptyVal = "") => {
+    setContentForm((current) => ({
+      ...current,
+      [key]: [...(current[key] || []), emptyVal],
+    }));
+  };
+  const removeArrayItem = (key, index) => {
+    setContentForm((current) => ({
+      ...current,
+      [key]: (current[key] || []).filter((_, i) => i !== index),
+    }));
+  };
+  const updateArrayItem = (key, index, value) => {
+    setContentForm((current) => {
+      const arr = [...(current[key] || [])];
+      arr[index] = value;
+      return { ...current, [key]: arr };
+    });
+  };
   const addCardItem = (key) => {
     updateContent((current) => ({
       ...current,
@@ -2320,7 +2423,7 @@ function AdminPage({ navigate }) {
         {(contentForm[key] || []).map((person, index) => (
           <article key={`${key}-${person.name}-${index}`}>
             <div className="person-preview">
-              <img src={person.imageUrl || image.directors[index % image.directors.length]} alt="" />
+              <img src={person.imageUrl || (Array.isArray(image.directors) ? image.directors[0] : "")} alt="" />
             </div>
             <div className="field-grid">
               <label>{t.personName}<input value={person.name || ""} onChange={(event) => updatePerson(key, index, { name: event.target.value })} /></label>
@@ -2411,7 +2514,7 @@ function AdminPage({ navigate }) {
         {(contentForm[key] || []).map((item, index) => (
           <article className="cms-card-editor" key={`${key}-${item.title || "card"}-${index}`}>
             <div className="cms-card-preview">
-              <img src={item.imageUrl || image.news[index % image.news.length]} alt="" />
+              <img src={item.imageUrl || (Array.isArray(image.news) ? image.news[0] : "")} alt="" />
             </div>
             <div className="field-grid">
               <label>{t.title}<input value={item.title || ""} onChange={(event) => updateCardItem(key, index, { title: event.target.value })} /></label>
@@ -2491,6 +2594,220 @@ function AdminPage({ navigate }) {
         </section>
       );
     }
+    if (selectedPage === "/") {
+      return (
+        <>
+          <section className="module-editor">
+            <div className="module-head">
+              <div>
+                <h3>{t.homeStatsSettings}</h3>
+                <p>{t.frontPageContentHelp}</p>
+              </div>
+            </div>
+            <div className="nested-list compact">
+              {(contentForm.homeStats || []).map((pair, index) => (
+                <article key={`stat-${index}`}>
+                  <label>{t.title}<input value={pair[0] || ""} onChange={(event) => updatePairList("homeStats", index, 0, event.target.value)} /></label>
+                  <label>{t.summary}<input value={pair[1] || ""} onChange={(event) => updatePairList("homeStats", index, 1, event.target.value)} /></label>
+                  <button className="text-button danger" onClick={() => removePairListItem("homeStats", index)}>{t.delete}</button>
+                </article>
+              ))}
+              <button className="text-button" onClick={() => addPairListItem("homeStats", ["", ""])}>{t.addItem}</button>
+            </div>
+          </section>
+          <section className="module-editor">
+            <div className="module-head">
+              <div>
+                <h3>{t.homeIntroSettings}</h3>
+                <p>{t.frontPageContentHelp}</p>
+              </div>
+            </div>
+            <label>{t.summary}<textarea rows={5} value={contentForm.homeIntro || ""} onChange={(event) => updateContent((current) => ({ ...current, homeIntro: event.target.value }))} /></label>
+          </section>
+          <section className="module-editor">
+            <div className="module-head">
+              <div>
+                <h3>{t.homeSupportSettings}</h3>
+                <p>{t.frontPageContentHelp}</p>
+              </div>
+            </div>
+            <div className="nested-list compact">
+              {(contentForm.homeSupportCards || []).map((pair, index) => (
+                <article key={`support-${index}`}>
+                  <label>{t.title}<input value={pair[0] || ""} onChange={(event) => updatePairList("homeSupportCards", index, 0, event.target.value)} /></label>
+                  <label>{t.summary}<textarea rows={2} value={pair[1] || ""} onChange={(event) => updatePairList("homeSupportCards", index, 1, event.target.value)} /></label>
+                  <button className="text-button danger" onClick={() => removePairListItem("homeSupportCards", index)}>{t.delete}</button>
+                </article>
+              ))}
+              <button className="text-button" onClick={() => addPairListItem("homeSupportCards", ["", ""])}>{t.addItem}</button>
+            </div>
+          </section>
+        </>
+      );
+    }
+    if (selectedPage === "/structure") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.governanceSettings}</h3>
+              <p>{t.frontPageContentHelp}</p>
+            </div>
+          </div>
+          <div className="nested-list compact">
+            {(contentForm.governanceGroups || []).map((item, index) => (
+              <article key={`gov-${index}`}>
+                <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList("governanceGroups", index, 0, event.target.value)} /></label>
+                <label>{t.summary}<textarea rows={2} value={item[1] || ""} onChange={(event) => updatePairList("governanceGroups", index, 1, event.target.value)} /></label>
+                <label>{t.people}<input value={item[2] || ""} onChange={(event) => updatePairList("governanceGroups", index, 2, event.target.value)} /></label>
+                <button className="text-button danger" onClick={() => removePairListItem("governanceGroups", index)}>{t.delete}</button>
+              </article>
+            ))}
+            <button className="text-button" onClick={() => addPairListItem("governanceGroups", ["", "", ""])}>{t.addGroup}</button>
+          </div>
+        </section>
+      );
+    }
+    if (selectedPage === "/industry") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.committeeSettings}</h3>
+              <p>{t.frontPageContentHelp}</p>
+            </div>
+          </div>
+          <div className="nested-list compact">
+            {(contentForm.committeeGroups || []).map((item, index) => (
+              <article key={`cmt-${index}`}>
+                <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList("committeeGroups", index, 0, event.target.value)} /></label>
+                <label>{t.count}<input value={item[1] || ""} onChange={(event) => updatePairList("committeeGroups", index, 1, event.target.value)} /></label>
+                <label>{t.summary}<textarea rows={3} value={Array.isArray(item[2]) ? item[2].join("、") : (item[2] || "")} onChange={(event) => updatePairList("committeeGroups", index, 2, event.target.value.split("、"))} /></label>
+                <button className="text-button danger" onClick={() => removePairListItem("committeeGroups", index)}>{t.delete}</button>
+              </article>
+            ))}
+            <button className="text-button" onClick={() => addPairListItem("committeeGroups", ["", "", []])}>{t.addGroup}</button>
+          </div>
+        </section>
+      );
+    }
+    if (selectedPage === "/membership") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.membershipStepsSettings}</h3>
+              <p>{t.frontPageContentHelp}</p>
+            </div>
+          </div>
+          <div className="nested-list compact">
+            {(contentForm.membershipSteps || []).map((step, index) => (
+              <article key={`step-${index}`}>
+                <label>{t.summary}<textarea rows={2} value={step} onChange={(event) => {
+                  const draft = [...(contentForm.membershipSteps || [])];
+                  draft[index] = event.target.value;
+                  updateContent((c) => ({ ...c, membershipSteps: draft }));
+                }} /></label>
+                <button className="text-button danger" onClick={() => {
+                  const draft = (contentForm.membershipSteps || []).filter((_, i) => i !== index);
+                  updateContent((c) => ({ ...c, membershipSteps: draft }));
+                }}>{t.removeStep}</button>
+              </article>
+            ))}
+            <button className="text-button" onClick={() => {
+              const draft = [...(contentForm.membershipSteps || []), ""];
+              updateContent((c) => ({ ...c, membershipSteps: draft }));
+            }}>{t.addStep}</button>
+          </div>
+        </section>
+      );
+    }
+    if (selectedPage === "/member-services") {
+      return renderPairListEditor("memberServiceLinks", t.memberServiceSettings, true);
+    }
+    if (selectedPage === "/resources") {
+      return renderPairListEditor("resourceLinks", t.resourceSettings, true);
+    }
+    if (selectedPage === "/charter") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.charterEditor}</h3>
+              <p>{t.charterEditorHelp}</p>
+            </div>
+          </div>
+          <div className="nested-list compact">
+            {(contentForm.charterSections || defaultCharterSections).map((pair, index) => (
+              <article key={`charter-${index}`}>
+                <label>{t.title}<input value={pair[0] || ""} onChange={(event) => updatePairList("charterSections", index, 0, event.target.value)} /></label>
+                <label>{t.summary}<textarea rows={3} value={pair[1] || ""} onChange={(event) => updatePairList("charterSections", index, 1, event.target.value)} /></label>
+                <button className="text-button danger" onClick={() => removePairListItem("charterSections", index)}>{t.delete}</button>
+              </article>
+            ))}
+            <button className="text-button" onClick={() => addPairListItem("charterSections", ["", ""])}>{t.addItem}</button>
+          </div>
+        </section>
+      );
+    }
+    if (["/agreement", "/certification", "/protection"].includes(selectedPage)) {
+      const key = selectedPage.replace("/", "") + "Sections";
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t[selectedPage.replace("/", "") + "Editor"] || t.agreementEditor}</h3>
+              <p>{t.legalEditorHelp}</p>
+            </div>
+          </div>
+          {renderPairListEditor(key, t.legalEditorHelp)}
+        </section>
+      );
+    }
+    if (selectedPage === "/announcements") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.announcementsEditor}</h3>
+              <p>{t.announcementsEditorHelp}</p>
+            </div>
+          </div>
+          <div className="nested-list compact">
+            {(contentForm.announcements || []).map((pair, index) => (
+              <article key={`ann-${index}`}>
+                <label>{t.title}<input value={pair[0] || ""} onChange={(event) => updatePairList("announcements", index, 0, event.target.value)} /></label>
+                <label>{t.summary}<textarea rows={3} value={pair[1] || ""} onChange={(event) => updatePairList("announcements", index, 1, event.target.value)} /></label>
+                <button className="text-button danger" onClick={() => removePairListItem("announcements", index)}>{t.delete}</button>
+              </article>
+            ))}
+            <button className="text-button" onClick={() => addPairListItem("announcements", ["", ""])}>{t.addItem}</button>
+          </div>
+        </section>
+      );
+    }
+    if (selectedPage === "/photo") {
+      return (
+        <section className="module-editor">
+          <div className="module-head">
+            <div>
+              <h3>{t.photoEditor}</h3>
+              <p>{t.photoEditorHelp}</p>
+            </div>
+          </div>
+          <div className="nested-list compact">
+            {(contentForm.galleryImages || []).map((item, index) => (
+              <article key={`photo-${index}`}>
+                <label>{t.photoUrl}<input value={item || ""} onChange={(event) => updateArrayItem("galleryImages", index, event.target.value)} /></label>
+                {item ? <img src={item} alt="" style={{maxHeight: "100px", objectFit: "cover", borderRadius: "8px"}} /> : null}
+                <button className="text-button danger" onClick={() => removeArrayItem("galleryImages", index)}>{t.delete}</button>
+              </article>
+            ))}
+            <button className="text-button" onClick={() => addArrayItem("galleryImages", "")}>{t.addPhoto}</button>
+          </div>
+        </section>
+      );
+    }
     return (
       <section className="module-empty">
         <h3>{t.frontPageContent}</h3>
@@ -2520,7 +2837,12 @@ function AdminPage({ navigate }) {
             <label>{t.password}<input type="password" minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
             <button className="primary" type="submit">{t.login}</button>
           </form>
-          {message ? <p className="form-status">{message}</p> : null}
+          {message ? (
+        <div className="form-status-row">
+          <p className="form-status">{message}</p>
+          <button className="text-button message-close" onClick={() => setMessage("")}>✕</button>
+        </div>
+      ) : null}
         </div>
       </section>
     );
@@ -2541,7 +2863,12 @@ function AdminPage({ navigate }) {
         </div>
       </div>
 
-      {message ? <p className="form-status admin-message">{message}</p> : null}
+      {message ? (
+        <div className="admin-message toast">
+          <p className="form-status">{message}</p>
+          <button className="text-button message-close" onClick={() => setMessage("")}>✕</button>
+        </div>
+      ) : null}
 
       <nav className="admin-tabs" aria-label="後台分欄">
         {[
@@ -2615,12 +2942,38 @@ function AdminPage({ navigate }) {
                 </div>
               </div>
               <div className="page-list-scroll" aria-label={t.selectPage}>
-                {editablePagePaths.map((path) => (
-                  <button key={path} className={selectedPage === path ? "is-active" : ""} onClick={() => setSelectedPage(path)}>
-                    <span>{pageNames[path]}</span>
-                    <small>{path}</small>
-                  </button>
-                ))}
+                {(() => {
+                  const groups = [
+                    { label: "首頁", paths: ["/"] },
+                    { label: "關於港中聯", paths: ["/about","/intro","/charter","/structure","/directors","/industry","/contact"] },
+                    { label: "商會服務", paths: ["/services"] },
+                    { label: "商會活動", paths: ["/activities","/news","/photo"] },
+                    { label: "會員服務", paths: ["/member-services","/member-benefits","/membership","/application","/agreement","/certification","/protection"] },
+                    { label: "資訊與資源", paths: ["/resources","/announcements","/downloads","/subscribe"] },
+                  ];
+                  const toggleGroup = (label) => {
+                    setOpenGroups((prev) =>
+                      prev.includes(label) ? prev.filter((g) => g !== label) : [...prev, label]
+                    );
+                  };
+                  const isGroupAlwaysOpen = (paths) => paths.length === 1 && paths[0] === "/";
+                  return groups.map((group) => {
+                    const isOpen = openGroups.includes(group.label) || isGroupAlwaysOpen(group.paths);
+                    return (
+                      <div key={group.label} className={`page-group${isOpen ? " is-open" : ""}`}>
+                        <div className="page-group-header" onClick={isGroupAlwaysOpen(group.paths) ? undefined : () => toggleGroup(group.label)} role="button" tabIndex={0} onKeyDown={(e) => { if (e.key === "Enter" || e.key === " ") toggleGroup(group.label); }}>
+                          {group.label}
+                          {isGroupAlwaysOpen(group.paths) ? null : <span className="group-toggle-icon">{isOpen ? "−" : "+"}</span>}
+                        </div>
+                        {isOpen ? group.paths.map((path) => (
+                          <button key={path} className={selectedPage === path ? "is-active" : ""} onClick={() => setSelectedPage(path)}>
+                            <span>{pageNames[path]}</span><small>{path}</small>
+                          </button>
+                        )) : null}
+                      </div>
+                    );
+                  });
+                })()}
               </div>
             </aside>
 
@@ -2631,7 +2984,7 @@ function AdminPage({ navigate }) {
                   <h3>{contentForm.pages[selectedPage]?.title || pageNames[selectedPage]}</h3>
                   <p>{selectedPage}</p>
                 </div>
-                <button className="secondary" onClick={() => navigate(selectedPage)}>{t.previewPage}</button>
+                <button className="secondary" onClick={() => setPreviewOpen(true)}>{t.previewPage}</button>
               </div>
 
               <section className="module-editor hero-editor">
@@ -2690,9 +3043,24 @@ function AdminPage({ navigate }) {
                 ))}
                 <button className="secondary" onClick={() => addPageBlock(selectedPage)}>{t.addBlock}</button>
               </div>
+              <div className="save-bar">
+                <button className="primary save-bottom" onClick={saveContent}>{t.saveContent}</button>
+              </div>
             </div>
           </div>
         </section>
+      ) : null}
+
+      {previewOpen ? (
+        <div className="preview-overlay" onClick={() => setPreviewOpen(false)} onKeyDown={(e) => { if (e.key === "Escape") setPreviewOpen(false); }} tabIndex={0} role="dialog" aria-modal="true" aria-label={t.previewPage}>
+          <div className="preview-modal" onClick={(e) => e.stopPropagation()}>
+            <div className="preview-head">
+              <h3>{t.previewPage}: {pageNames[selectedPage]}</h3>
+              <button className="text-button" onClick={() => setPreviewOpen(false)}>✕ 關閉</button>
+            </div>
+            <iframe src={selectedPage} title={pageNames[selectedPage]} className="preview-iframe" />
+          </div>
+        </div>
       ) : null}
 
       {activeTab === "settings" ? (
@@ -2704,131 +3072,24 @@ function AdminPage({ navigate }) {
             </div>
             <button className="primary" onClick={saveContent}>{t.saveContent}</button>
           </div>
-
           <div className="settings-grid">
-            <section className="settings-card">
+            <section className="settings-card wide">
               <h3>{t.contactSettings}</h3>
               <div className="field-grid single">
                 {["phone", "email", "addressZh", "addressEn"].map((key) => (
                   <label key={key}>{t[key]}<input value={contentForm.contact?.[key] || ""} onChange={(event) => updateContent((current) => ({ ...current, contact: { ...current.contact, [key]: event.target.value } }))} /></label>
                 ))}
+                <label className="upload-button">
+                  {t.faviconLabel || "網站圖標 (Favicon)"}
+                  <input type="file" accept="image/png,image/x-icon,image/svg+xml" onChange={(event) => uploadImage(event, (url) => updateContent((current) => ({ ...current, siteIcon: url })))} />
+                </label>
+                {contentForm.siteIcon ? <label>URL<input value={contentForm.siteIcon} onChange={(event) => updateContent((current) => ({ ...current, siteIcon: event.target.value }))} placeholder="https://..." /></label> : null}
+                {contentForm.siteIcon ? <img src={contentForm.siteIcon} alt="" style={{maxWidth: "48px", maxHeight: "48px", borderRadius: "6px"}} /> : null}
               </div>
             </section>
-
-            <section className="settings-card wide">
-              <h3>{t.aboutSettings}</h3>
-              <div className="field-grid">
-                {["associationIntro", "associationPurpose", "mission", "associationStory"].map((key) => (
-                  <label key={key} className="full">{t[key]}
-                    <textarea
-                      rows={5}
-                      value={contentForm.aboutContent?.[key] || ""}
-                      onChange={(event) => updateContent((current) => ({
-                        ...current,
-                        aboutContent: { ...current.aboutContent, [key]: event.target.value },
-                      }))}
-                    />
-                  </label>
-                ))}
-              </div>
-            </section>
-
-            {[
-              ["directorProfiles", t.directorsSettings],
-              ["managementProfiles", t.managementSettings],
-            ].map(([key, label]) => (
-              <section className="settings-card wide" key={key}>
-                <div className="admin-panel-head">
-                  <h3>{label}</h3>
-                  <button className="text-button" onClick={() => addPerson(key)}>{t.addPerson}</button>
-                </div>
-                <div className="people-editor">
-                  {(contentForm[key] || []).map((person, index) => (
-                    <article key={`${key}-${person.name}-${index}`}>
-                      <div className="person-preview">
-                        <img src={person.imageUrl || image.directors[index % image.directors.length]} alt="" />
-                      </div>
-                      <div className="field-grid">
-                        <label>{t.personName}<input value={person.name || ""} onChange={(event) => updatePerson(key, index, { name: event.target.value })} /></label>
-                        <label>{t.personRole}<input value={person.role || ""} onChange={(event) => updatePerson(key, index, { role: event.target.value })} /></label>
-                        <label className="full">{t.personImage}<input value={person.imageUrl || ""} onChange={(event) => updatePerson(key, index, { imageUrl: event.target.value })} placeholder="https://..." /></label>
-                        <label className="upload-button">
-                          {t.uploadImage}
-                          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePerson(key, index, { imageUrl: url }))} />
-                        </label>
-                        <button className="text-button danger" onClick={() => removePerson(key, index)}>{t.removePerson}</button>
-                      </div>
-                    </article>
-                  ))}
-                </div>
-              </section>
-            ))}
-
-            <section className="settings-card wide">
-              <div className="admin-panel-head">
-                <h3>{t.serviceSettings}</h3>
-                <button className="text-button" onClick={addService}>{t.addService}</button>
-              </div>
-              <div className="nested-list">
-                {(contentForm.coreServices || []).map((service, index) => (
-                  <article key={`${service.title}-${index}`}>
-                    <div className="admin-panel-head">
-                      <h4>{service.title || `${t.serviceSettings} ${index + 1}`}</h4>
-                      <button className="text-button danger" onClick={() => removeService(index)}>{t.removeService}</button>
-                    </div>
-                    <div className="field-grid">
-                      <label>{t.title}<input value={service.title || ""} onChange={(event) => updateService(index, { title: event.target.value })} /></label>
-                      <label>{t.serviceValue}<input value={service.value || ""} onChange={(event) => updateService(index, { value: event.target.value })} /></label>
-                      <label className="full">{t.serviceItems}
-                        <textarea
-                          rows={5}
-                          value={(service.items || []).map(([itemTitle, itemDesc]) => `${itemTitle || ""}｜${itemDesc || ""}`).join("\n")}
-                          onChange={(event) => updateService(index, {
-                            items: event.target.value.split("\n").map((line) => {
-                              const [itemTitle = "", itemDesc = ""] = line.split("｜");
-                              return [itemTitle.trim(), itemDesc.trim()];
-                            }).filter(([itemTitle, itemDesc]) => itemTitle || itemDesc),
-                          })}
-                        />
-                      </label>
-                    </div>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="settings-card">
-              <div className="admin-panel-head">
-                <h3>{t.benefitsSettings}</h3>
-                <button className="text-button" onClick={() => addPairListItem("memberBenefits", ["", ""])}>{t.addItem}</button>
-              </div>
-              <div className="nested-list compact">
-                {(contentForm.memberBenefits || []).map((item, index) => (
-                  <article key={`${item[0]}-${index}`}>
-                    <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList("memberBenefits", index, 0, event.target.value)} /></label>
-                    <label>{t.summary}<textarea rows={3} value={item[1] || ""} onChange={(event) => updatePairList("memberBenefits", index, 1, event.target.value)} /></label>
-                    <button className="text-button danger" onClick={() => removePairListItem("memberBenefits", index)}>{t.delete}</button>
-                  </article>
-                ))}
-              </div>
-            </section>
-
-            <section className="settings-card">
-              <div className="admin-panel-head">
-                <h3>{t.downloadsSettings}</h3>
-                <button className="text-button" onClick={() => addPairListItem("downloads", ["", "", "/"])}>{t.addItem}</button>
-              </div>
-              <div className="nested-list compact">
-                {(contentForm.downloads || []).map((item, index) => (
-                  <article key={`${item[0]}-${index}`}>
-                    <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList("downloads", index, 0, event.target.value)} /></label>
-                    <label>{t.summary}<textarea rows={3} value={item[1] || ""} onChange={(event) => updatePairList("downloads", index, 1, event.target.value)} /></label>
-                    <label>URL<input value={item[2] || ""} onChange={(event) => updatePairList("downloads", index, 2, event.target.value)} /></label>
-                    <button className="text-button danger" onClick={() => removePairListItem("downloads", index)}>{t.delete}</button>
-                  </article>
-                ))}
-              </div>
-            </section>
+          </div>
+          <div className="save-bar">
+            <button className="primary save-bottom" onClick={saveContent}>{t.saveContent}</button>
           </div>
         </section>
       ) : null}
@@ -2839,18 +3100,38 @@ function AdminPage({ navigate }) {
             <h2>{t.applications}</h2>
             <span>{applications.length} {t.records}</span>
           </div>
-          <div className="application-table">
+          <div className="application-cards">
             {applications.map((item) => (
-              <article key={item.id}>
-                <strong>{item.name}</strong>
-                <span>{item.company || "未填公司"}</span>
-                <span>{item.role || "未填職位"}</span>
-                <span>{item.phone}</span>
-                <span>{item.email || "未填電郵"}</span>
-                <p>{item.interest || "未填感興趣服務"}</p>
+              <article key={item.id} className="application-card">
+                <div className="app-card-head">
+                  <strong>{item.name}</strong>
+                  <span className="app-card-date">{new Date(item.createdAt).toLocaleDateString("zh-HK")}</span>
+                </div>
+                <div className="app-card-grid">
+                  <div className="app-card-field">
+                    <span className="app-field-label">公司</span>
+                    <span className="app-card-val">{item.company || "-"}</span>
+                  </div>
+                  <div className="app-card-field">
+                    <span className="app-field-label">職位</span>
+                    <span className="app-card-val">{item.role || "-"}</span>
+                  </div>
+                  <div className="app-card-field">
+                    <span className="app-field-label">電話</span>
+                    <span className="app-card-val">{item.phone}</span>
+                  </div>
+                  <div className="app-card-field">
+                    <span className="app-field-label">電郵</span>
+                    <span className="app-card-val">{item.email || "-"}</span>
+                  </div>
+                </div>
+                <div className="app-card-field full">
+                  <span className="app-field-label">感興趣服務</span>
+                  <span className="app-card-val">{item.interest || "未填"}</span>
+                </div>
               </article>
             ))}
-            {!applications.length ? <p>{t.emptyApplications}</p> : null}
+            {!applications.length ? <p className="empty-state">{t.emptyApplications}</p> : null}
           </div>
         </section>
       ) : null}
