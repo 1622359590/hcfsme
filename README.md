@@ -46,8 +46,8 @@ npm run build
 - `/membership`：入會須知
 - `/agreement`：會員服務協議
 - `/certification`：實名認證協議
-- `/protection`：信息保護政策
-- `/contact`：聯系我們
+- `/protection`：資訊保護政策
+- `/contact`：聯絡我們
 - `/subscribe`：訂閱我們
 
 ## 內容與資源
