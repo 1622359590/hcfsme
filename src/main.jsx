@@ -392,6 +392,67 @@ const defaultActivities = [
     url: "/application",
   },
 ];
+const defaultHomeStats = [
+  ["27年", "建會歷程"],
+  ["30+", "行業委員會"],
+  ["全球", "中小企業支援網絡"],
+];
+
+const defaultHomeIntro = "紮根大中華，立足香港，服務全球中小企業。香港中小企業工商聯合會是一家香港特區政府法定公認的非盈利國際組織。自1998年創會以來，港中聯以服務及支援會員單位為己任，聚集香港工商業各界優秀企業代表，以強企之心，行助企之事。本會持續以中央政府和香港特區政府為後盾，貫徹「商源香江 惠通全球」的宗旨，協助中小企業拓展世界商機。";
+
+const defaultHomeSupportCards = [
+  ["青年發展基金", "支持香港青年在香港及大灣區內地城市創業，提供資本資助、創業支援及孵化服務。"],
+  ["中小企連線", "讓中小企業在單一平台獲取工業貿易署、香港貿發局等支援資訊。"],
+  ["創科生活基金", "資助能為市民帶來更方便、舒適和安全生活的創科項目。"],
+  ["創意智優計劃", "資助有助創意產業發展的項目，支援網上提交申請。"],
+  ["創新及科技基金", "鼓勵香港企業提升科技水平，為業務注入更多創新意念。"],
+  ["專利申請資助計劃", "以撥款形式協助本地公司及個人為其發明申請專利。"],
+  ["中小企業市場推廣基金", "鼓勵中小企業參與出口推廣活動，協助擴展香港境外市場。"],
+  ["科技券", "支援本地企業及機構使用科技服務和方案，提高生產力並升級轉型。"],
+  ["BUD專項基金", "協助香港中小企業融資、擴展海外市場及提高競爭力。"],
+];
+
+const defaultGovernanceGroups = [
+  ["會董會", "戰略領航，最高決策。審議及批准重大投資、戰略規劃及人事任免。", "蔣文凱 Elisa、韓君 Alex Han、鄭綺文 Elaine Cheng、李迎春 Shirley Li、譚耀泉、禹雲均"],
+  ["監察委員會", "獨立監察會務運作合規性，審計財務狀況，防範運營風險。", "黃桂林、梁志超"],
+  ["名譽主席團", "借助社會影響力與資源網絡，提升聯合會公信力及對外聯絡層次。", "勞英夫、劉衛東、羅文浩、彭樹穩、鄭偉俊、許倩華、謝燕飛"],
+  ["顧問團隊", "提供專業諮詢、決策支持與智力服務。", "呂志豪、陳佩斯、蘇彥威"],
+  ["應屆執行委員會", "負責落實會董會決議及日常會務運作。", "會長鄭綺文、指導主席譚耀泉、執行會長曾崇瑞、秘書長胡海燕"],
+];
+
+const defaultCommitteeGroups = [
+  ["大健康及生物科技產業", "23 人", ["大健康產業發展委員會", "健康產業發展委員會", "健康環保科技委員會", "生物科技發展委員會", "生物科技皮膚健康委員會", "眼健康產業發展委員會"]],
+  ["金融及資產管理產業", "16 人", ["金融發展委員會", "金融業界發展委員會", "保險界委員會", "互聯網金融委員會", "供應鏈金融發展委員會", "新金融資管傳承委員會", "上市產業專家委員會"]],
+  ["科技、數智及新興產業", "14 人", ["Web3.0/人工智慧產業發展委員會", "數智化發展委員會", "數字文旅產業發展委員會", "元宇宙行業發展委員會", "新媒體產業發展委員會", "智能家居行業委員會"]],
+  ["灣區融合及區域發展", "14 人", ["大灣區發展籌委會", "深圳發展委員會", "產業培育委員會", "港品發展委員會", "專業移民發展委員會", "專業移民顧問發展委員會"]],
+  ["服務業、零售及消費產業", "22 人", ["餐飲業委員會", "批發及零售委員會", "新零售產業發展委員會", "品牌推廣發展委員會", "美容化妝業界委員會", "旅遊業界發展委員會", "時尚產業發展委員會", "鐘錶業界發展委員會", "房地產業發展委員會"]],
+  ["區域發展與辦事處", "6 個", ["佛山辦事處", "福建辦事處", "杭州辦事處", "洛陽辦事處", "重慶辦事處", "遼寧分會"]],
+];
+
+const defaultMembershipSteps = [
+  "登錄港中聯官方網站，點擊首頁「入會申請」進入事必簽電子簽約系統。",
+  "內地會員完整、真實、準確填寫資訊，完成個人認證及企業認證後簽署會員服務協議。",
+  "香港企業會員完成會員服務費支付後，聯繫商會秘書處協助辦理核證申請。",
+  "會員支付會員服務費及電子簽約服務費，內地企業會員服務費為 CNY10000元/兩年。",
+  "香港企業會員服務費為 HKD10000元/兩年，認證簽署服務費為 HKD580元/次。",
+  "支付完成後，系統發送訂單票據與簽署成功通知郵件。",
+];
+
+const defaultMemberServiceLinks = [
+  ["/member-benefits", "會員類別及權益", "了解企業會員、個人會員、會務參與與活動優先權益。"],
+  ["/membership", "入會須知", "了解電子簽約入會流程、服務費及認證要求。"],
+  ["/application", "線上入會預登記", "留下公司、職位、聯絡方式及感興趣服務，秘書處跟進。"],
+  ["/agreement", "會員服務協議", "查看會員服務、費用、權利義務與爭議處理條款。"],
+  ["/certification", "實名認證協議", "了解實名認證、數字證書與電子簽名服務規則。"],
+  ["/protection", "資訊保護政策", "查看法律聲明、個人資訊保護與用戶權利。"],
+];
+
+const defaultResourceLinks = [
+  ["/news", "新聞稿", "按年度整理港中聯活動、合作、簽約與會務消息。"],
+  ["/services", "政策與商機資訊", "聚合香港及大灣區最新扶持政策、資助計劃及調研摘錄。"],
+  ["/announcements", "公告", "入會公示、會議通知及商會重要事項公告。"],
+];
+
 
 const legalPages = {
   agreement: {
@@ -511,6 +572,14 @@ const defaultEditableContent = {
   directorProfiles: defaultDirectorProfiles,
   managementProfiles: defaultManagementProfiles,
   aboutContent: defaultAboutContent,
+  homeStats: defaultHomeStats,
+  homeIntro: defaultHomeIntro,
+  homeSupportCards: defaultHomeSupportCards,
+  governanceGroups: defaultGovernanceGroups,
+  committeeGroups: defaultCommitteeGroups,
+  membershipSteps: defaultMembershipSteps,
+  memberServiceLinks: defaultMemberServiceLinks,
+  resourceLinks: defaultResourceLinks,
   pages: defaultPageContent,
 };
 
@@ -533,6 +602,14 @@ function mergeEditableContent(input = {}) {
     contact: { ...contact, ...(input.contact || {}) },
     coreServices: Array.isArray(input.coreServices) ? input.coreServices : coreServices,
     activities: Array.isArray(input.activities) ? input.activities : defaultActivities,
+    homeStats: Array.isArray(input.homeStats) ? input.homeStats : defaultHomeStats,
+    homeIntro: typeof input.homeIntro === 'string' ? input.homeIntro : defaultHomeIntro,
+    homeSupportCards: Array.isArray(input.homeSupportCards) ? input.homeSupportCards : defaultHomeSupportCards,
+    governanceGroups: Array.isArray(input.governanceGroups) ? input.governanceGroups : defaultGovernanceGroups,
+    committeeGroups: Array.isArray(input.committeeGroups) ? input.committeeGroups : defaultCommitteeGroups,
+    membershipSteps: Array.isArray(input.membershipSteps) ? input.membershipSteps : defaultMembershipSteps,
+    memberServiceLinks: Array.isArray(input.memberServiceLinks) ? input.memberServiceLinks : defaultMemberServiceLinks,
+    resourceLinks: Array.isArray(input.resourceLinks) ? input.resourceLinks : defaultResourceLinks,
     memberBenefits: Array.isArray(input.memberBenefits) ? input.memberBenefits : memberBenefits,
     downloads: Array.isArray(input.downloads) ? input.downloads : downloads,
     directorProfiles: Array.isArray(input.directorProfiles) ? input.directorProfiles : defaultDirectorProfiles,
@@ -842,23 +919,23 @@ function Header({ path, navigate, mobileOpen, setMobileOpen, siteContact }) {
 
 function RenderPage({ path, navigate, content, siteContact }) {
   let page = null;
-  if (path === "/") page = <Home navigate={navigate} />;
+  if (path === "/") page = <Home navigate={navigate} content={content} />;
   if (path === "/about") page = <AboutPage navigate={navigate} />;
   if (path === "/intro") page = <IntroPage />;
   if (path === "/charter") page = <CharterPage />;
-  if (path === "/structure") page = <StructurePage />;
+  if (path === "/structure") page = <StructurePage content={content} />;
   if (path === "/directors") page = <DirectorsPage />;
   if (path === "/services") page = <ServicesPage content={content} />;
-  if (path === "/industry") page = <IndustryPage />;
+  if (path === "/industry") page = <IndustryPage content={content} />;
   if (path === "/activities") page = <ActivitiesPage navigate={navigate} content={content} />;
   if (path === "/news") page = <NewsPage />;
   if (path === "/photo") page = <PhotoPage />;
-  if (path === "/member-services") page = <MemberServices navigate={navigate} />;
+  if (path === "/member-services") page = <MemberServices navigate={navigate} content={content} />;
   if (path === "/member-benefits") page = <MemberBenefitsPage content={content} />;
-  if (path === "/membership") page = <MembershipPage />;
+  if (path === "/membership") page = <MembershipPage content={content} />;
   if (path === "/application") page = <ApplicationPage />;
   if (["/agreement", "/certification", "/protection"].includes(path)) page = <LegalPage data={pages[path]} />;
-  if (path === "/resources") page = <ResourcesPage navigate={navigate} />;
+  if (path === "/resources") page = <ResourcesPage navigate={navigate} content={content} />;
   if (path === "/announcements") page = <AnnouncementsPage />;
   if (path === "/downloads") page = <DownloadsPage navigate={navigate} content={content} />;
   if (path === "/contact") page = <ContactPage siteContact={siteContact} />;
@@ -1107,7 +1184,10 @@ function AboutPage({ navigate }) {
   );
 }
 
-function StructurePage() {
+function StructurePage({ content }) {
+  const ctx = content || defaultEditableContent;
+  const govGroups = ctx.governanceGroups || defaultGovernanceGroups;
+  const comGroups = ctx.committeeGroups || defaultCommitteeGroups;
   return (
     <>
       <PageHero {...pages["/structure"]} imageUrl={image.structure} />
@@ -1123,7 +1203,7 @@ function StructurePage() {
         </div>
       </section>
       <section className="section governance-list">
-        {governanceGroups.map(([title, desc, people]) => (
+        {govGroups.map(([title, desc, people]) => (
           <article key={title}>
             <h2>{title}</h2>
             <p>{desc}</p>
@@ -1137,7 +1217,7 @@ function StructurePage() {
           <p>按產業屬性劃分為六大板塊，逐步承接行業交流、政策解讀、企業走訪與資源對接。</p>
         </div>
         <div className="committee-list">
-          {committeeGroups.map(([title, count, items]) => (
+          {comGroups.map(([title, count, items]) => (
             <article key={title}>
               <div>
                 <h3>{title}</h3>
@@ -1279,7 +1359,9 @@ function ServicesPage({ content }) {
   );
 }
 
-function IndustryPage() {
+function IndustryPage({ content }) {
+  const ctx = content || defaultEditableContent;
+  const comGroups = ctx.committeeGroups || defaultCommitteeGroups;
   return (
     <>
       <PageHero {...pages["/industry"]} imageUrl={image.side} />
@@ -1291,7 +1373,7 @@ function IndustryPage() {
       </section>
       <section className="section committee-board">
         <div className="committee-list">
-          {committeeGroups.map(([title, count, items]) => (
+          {comGroups.map(([title, count, items]) => (
             <article key={title}>
               <div>
                 <h3>{title}</h3>
@@ -1409,7 +1491,9 @@ function ActivitiesPage({ navigate, content }) {
   );
 }
 
-function MemberServices({ navigate }) {
+function MemberServices({ navigate, content }) {
+  const ctx = content || defaultEditableContent;
+  const links = ctx.memberServiceLinks || defaultMemberServiceLinks;
   return (
     <>
       <PageHero {...pages["/member-services"]} imageUrl={image.funding} />
@@ -1420,14 +1504,7 @@ function MemberServices({ navigate }) {
         </p>
       </section>
       <section className="section service-links">
-        {[
-          ["/member-benefits", "會員類別及權益", "了解企業會員、個人會員、會務參與與活動優先權益。"],
-          ["/membership", "入會須知", "了解電子簽約入會流程、服務費及認證要求。"],
-          ["/application", "線上入會預登記", "留下公司、職位、聯絡方式及感興趣服務，秘書處跟進。"],
-          ["/agreement", "會員服務協議", "查看會員服務、費用、權利義務與爭議處理條款。"],
-          ["/certification", "實名認證協議", "了解實名認證、數字證書與電子簽名服務規則。"],
-          ["/protection", "資訊保護政策", "查看法律聲明、個人資訊保護與用戶權利。"],
-        ].map(([path, title, desc]) => (
+        {links.map(([path, title, desc]) => (
           <button key={path} onClick={() => navigate(path)}>
             <ShieldCheck size={28} />
             <h2>{title}</h2>
@@ -1462,7 +1539,9 @@ function MemberBenefitsPage({ content }) {
   );
 }
 
-function MembershipPage() {
+function MembershipPage({ content }) {
+  const ctx = content || defaultEditableContent;
+  const steps = ctx.membershipSteps || defaultMembershipSteps;
   return (
     <>
       <PageHero {...pages["/membership"]} imageUrl={image.gallery[4]} />
@@ -1473,15 +1552,8 @@ function MembershipPage() {
           </p>
         </div>
         <div className="steps">
-          {[
-            "登錄港中聯官方網站，點擊首頁「入會申請」進入事必簽電子簽約系統。",
-            "內地會員完整、真實、準確填寫資訊，完成個人認證及企業認證後簽署會員服務協議。",
-            "香港企業會員完成會員服務費支付後，聯繫商會秘書處協助辦理核證申請。",
-            "會員支付會員服務費及電子簽約服務費，內地企業會員服務費為 CNY10000元/兩年。",
-            "香港企業會員服務費為 HKD10000元/兩年，認證簽署服務費為 HKD580元/次。",
-            "支付完成後，系統發送訂單票據與簽署成功通知郵件。",
-          ].map((step, index) => (
-            <article key={step}>
+          {steps.map((step, index) => (
+            <article key={index}>
               <span>{index + 1}</span>
               <p>{step}</p>
             </article>
@@ -1559,17 +1631,15 @@ function LegalPage({ data }) {
   );
 }
 
-function ResourcesPage({ navigate }) {
+function ResourcesPage({ navigate, content }) {
+  const ctx = content || defaultEditableContent;
+  const links = ctx.resourceLinks || defaultResourceLinks;
   return (
     <>
       <PageHero {...pages["/resources"]} imageUrl={image.gallery[3]} />
       <section className="section resource-list">
-        {[
-          ["新聞稿", "按年度整理港中聯活動、合作、簽約與會務消息。", "/news"],
-          ["政策與商機資訊", "聚合香港及大灣區最新扶持政策、資助計劃及調研摘錄。", "/services"],
-          ["公告", "入會公示、會議通知及商會重要事項公告。", "/announcements"],
-        ].map(([title, desc, path]) => (
-          <article key={title}>
+        {links.map(([path, title, desc]) => (
+          <article key={path}>
             <h2>{title}</h2>
             <p>{desc}</p>
             <button className="text-button" onClick={() => navigate(path)}>前往查看 <ArrowRight size={16} /></button>
@@ -1748,6 +1818,20 @@ function AdminPage({ navigate }) {
       moveUp: "上移",
       moveDown: "下移",
       previewPage: "預覽頁面",
+      homeStatsSettings: "首頁統計數據",
+      homeIntroSettings: "首頁簡介文案",
+      homeSupportSettings: "支援卡片",
+      governanceSettings: "治理分組",
+      committeeSettings: "委員會分組",
+      membershipStepsSettings: "入會步驟",
+      memberServiceSettings: "會員服務入口",
+      resourceSettings: "資訊中心入口",
+      addGroup: "新增分組",
+      removeGroup: "刪除分組",
+      addStep: "新增步驟",
+      removeStep: "刪除步驟",
+      count: "人數",
+      people: "成員",
       aboutSettings: "商會簡介文案",
       associationIntro: "商會簡介（每段一行）",
       associationPurpose: "本會宗旨（每段一行）",
@@ -1840,6 +1924,20 @@ function AdminPage({ navigate }) {
       moveUp: "Move up",
       moveDown: "Move down",
       previewPage: "Preview page",
+      homeStatsSettings: "Homepage stats",
+      homeIntroSettings: "Homepage intro text",
+      homeSupportSettings: "Support cards",
+      governanceSettings: "Governance groups",
+      committeeSettings: "Committee groups",
+      membershipStepsSettings: "Membership steps",
+      memberServiceSettings: "Member services links",
+      resourceSettings: "Resource links",
+      addGroup: "Add group",
+      removeGroup: "Remove group",
+      addStep: "Add step",
+      removeStep: "Remove step",
+      count: "Count",
+      people: "Members",
       aboutSettings: "Association profile copy",
       associationIntro: "Association intro, one paragraph per line",
       associationPurpose: "Purpose, one paragraph per line",
