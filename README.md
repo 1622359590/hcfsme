@@ -31,6 +31,37 @@ npm run build
 
 構建輸出位於 `dist/`，該目錄不提交到 Git。
 
+## 簡易後台
+
+本項目已內置一個輕量 Node 後台，適合部署到自有服務器。後台使用本地 JSON 文件保存資料，不依賴外部數據庫。
+
+先構建前台：
+
+```bash
+npm run build
+```
+
+再啟動前後台一體服務：
+
+```bash
+ADMIN_PASSWORD="請換成強密碼" PORT=8787 npm run serve
+```
+
+訪問地址：
+
+```text
+http://localhost:8787/
+http://localhost:8787/admin
+```
+
+後台目前支持：
+
+- 管理新聞：新增、編輯、刪除新聞。
+- 入會預登記：查看前台 `/application` 表單提交記錄。
+- 前台新聞頁：優先讀取後台新聞資料，後台不可用時回退到本地默認資料。
+
+運行資料存放於 `data/store.json`，該文件不提交到 Git。部署時請定期備份此文件；如後續資料量增加，可再升級為 MySQL、PostgreSQL 或其他數據庫。
+
 ## 頁面結構
 
 - `/`：首頁
@@ -56,6 +87,7 @@ npm run build
 - `/downloads`：資源下載
 - `/contact`：聯絡我們
 - `/subscribe`：訂閱我們
+- `/admin`：網站後台
 
 ## 內容與資源
 

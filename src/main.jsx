@@ -80,6 +80,22 @@ const contact = {
   addressEn: "Room 9, 20/F., Kowloon Plaza, 485 Castle Peak Road, Cheung Sha Wan, Kowloon",
 };
 
+const apiBase = import.meta.env.VITE_API_BASE || "";
+
+async function apiRequest(path, options = {}) {
+  const response = await fetch(`${apiBase}${path}`, {
+    headers: {
+      "Content-Type": "application/json",
+      ...(options.token ? { Authorization: `Bearer ${options.token}` } : {}),
+      ...(options.headers || {}),
+    },
+    ...options,
+  });
+  const data = await response.json().catch(() => ({}));
+  if (!response.ok) throw new Error(data.error || "操作失敗");
+  return data;
+}
+
 const nav = [
   { label: "首頁", path: "/" },
   {
@@ -391,6 +407,7 @@ const pages = {
   "/downloads": { title: "資源下載", subtitle: "章程、入會表格、資助計劃與活動資料入口" },
   "/contact": { title: "聯絡我們", subtitle: "我們的全球辦事處與秘書處聯絡方式" },
   "/subscribe": { title: "訂閱我們", subtitle: "收取更多本會宣傳資訊與 Newsletter" },
+  "/admin": { title: "網站後台", subtitle: "內容管理與入會預登記資料" },
 };
 
 function normalizePath(path) {
@@ -433,6 +450,7 @@ function App() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const appRef = useRef(null);
   const title = pages[path]?.title || pages["/"].title;
+  const isAdmin = path === "/admin";
 
   useEffect(() => {
     document.title = `${title} | 香港中小企業工商聯合會`;
@@ -540,11 +558,11 @@ function App() {
 
   return (
     <div ref={appRef}>
-      <Header path={path} navigate={navigate} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} />
+      {!isAdmin ? <Header path={path} navigate={navigate} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} /> : null}
       <main>
         <RenderPage path={path} navigate={navigate} />
       </main>
-      <Footer navigate={navigate} />
+      {!isAdmin ? <Footer navigate={navigate} /> : null}
     </div>
   );
 }
@@ -622,6 +640,7 @@ function RenderPage({ path, navigate }) {
   if (path === "/downloads") return <DownloadsPage navigate={navigate} />;
   if (path === "/contact") return <ContactPage />;
   if (path === "/subscribe") return <SubscribePage />;
+  if (path === "/admin") return <AdminPage navigate={navigate} />;
   return <Home navigate={navigate} />;
 }
 
@@ -1003,6 +1022,14 @@ function IndustryPage() {
 }
 
 function NewsStrip({ navigate }) {
+  const [items, setItems] = useState(news);
+
+  useEffect(() => {
+    apiRequest("/api/news")
+      .then((data) => setItems(data.news?.length ? data.news : news))
+      .catch(() => setItems(news));
+  }, []);
+
   return (
     <section className="section news-strip">
       <div>
@@ -1010,7 +1037,7 @@ function NewsStrip({ navigate }) {
         <button className="text-button" onClick={() => navigate("/news")}>查看全部 <ArrowRight size={16} /></button>
       </div>
       <div className="news-row">
-        {news.slice(0, 3).map((item) => (
+        {items.slice(0, 3).map((item) => (
           <article key={item.title}>
             <span>{item.date}</span>
             <h3>{item.title}</h3>
@@ -1023,13 +1050,21 @@ function NewsStrip({ navigate }) {
 }
 
 function NewsPage() {
+  const [items, setItems] = useState(news);
+
+  useEffect(() => {
+    apiRequest("/api/news")
+      .then((data) => setItems(data.news?.length ? data.news : news))
+      .catch(() => setItems(news));
+  }, []);
+
   return (
     <>
       <PageHero {...pages["/news"]} imageUrl={image.news[3]} />
       <section className="section news-grid">
-        {news.map((item, index) => (
+        {items.map((item, index) => (
           <article key={item.title}>
-            <img src={image.news[index % image.news.length]} alt={`${item.title} 活動圖片`} />
+            <img src={item.image || image.news[index % image.news.length]} alt={`${item.title} 活動圖片`} />
             <div>
               <span><CalendarBlank size={16} /> {item.date}</span>
               <h2>{item.title}</h2>
@@ -1167,22 +1202,49 @@ function MembershipPage() {
 }
 
 function ApplicationPage() {
+  const [form, setForm] = useState({ name: "", company: "", role: "", phone: "", email: "", interest: "" });
+  const [status, setStatus] = useState("");
+  const [submitting, setSubmitting] = useState(false);
+
+  const update = (field) => (event) => {
+    setForm((current) => ({ ...current, [field]: event.target.value }));
+  };
+
+  const submit = async (event) => {
+    event.preventDefault();
+    setSubmitting(true);
+    setStatus("");
+    try {
+      await apiRequest("/api/applications", {
+        method: "POST",
+        body: JSON.stringify(form),
+      });
+      setForm({ name: "", company: "", role: "", phone: "", email: "", interest: "" });
+      setStatus("提交成功，秘書處將按資料跟進。");
+    } catch (error) {
+      setStatus(error.message || "提交失敗，請稍後再試。");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
   return (
     <>
       <PageHero {...pages["/application"]} imageUrl={image.meeting} />
       <section className="section application-panel">
         <div>
           <h2>預登記資料</h2>
-          <p>目前表單為前端預登記入口，後續可接入後台或郵件提交。提交前不會向外部傳送資料。</p>
+          <p>表單會提交至網站後台，秘書處可在後台查看並跟進入會流程。姓名及聯絡電話為必填。</p>
+          {status ? <p className="form-status">{status}</p> : null}
         </div>
-        <form onSubmit={(event) => event.preventDefault()}>
-          <label>姓名<input type="text" placeholder="請輸入姓名" /></label>
-          <label>公司名稱<input type="text" placeholder="請輸入公司名稱" /></label>
-          <label>職位<input type="text" placeholder="請輸入職位" /></label>
-          <label>聯絡電話<input type="tel" placeholder="+852 / +86" /></label>
-          <label>電郵地址<input type="email" placeholder="name@example.com" /></label>
-          <label className="full">感興趣服務<input type="text" placeholder="例如：政府資助、大灣區對接、行業委員會、企業培訓" /></label>
-          <button className="primary" type="submit">提交預登記 <ArrowRight size={18} /></button>
+        <form onSubmit={submit}>
+          <label>姓名<input type="text" placeholder="請輸入姓名" value={form.name} onChange={update("name")} required /></label>
+          <label>公司名稱<input type="text" placeholder="請輸入公司名稱" value={form.company} onChange={update("company")} /></label>
+          <label>職位<input type="text" placeholder="請輸入職位" value={form.role} onChange={update("role")} /></label>
+          <label>聯絡電話<input type="tel" placeholder="+852 / +86" value={form.phone} onChange={update("phone")} required /></label>
+          <label>電郵地址<input type="email" placeholder="name@example.com" value={form.email} onChange={update("email")} /></label>
+          <label className="full">感興趣服務<input type="text" placeholder="例如：政府資助、大灣區對接、行業委員會、企業培訓" value={form.interest} onChange={update("interest")} /></label>
+          <button className="primary" type="submit" disabled={submitting}>{submitting ? "提交中..." : "提交預登記"} <ArrowRight size={18} /></button>
         </form>
       </section>
     </>
@@ -1321,6 +1383,200 @@ function SubscribePage() {
         </form>
       </section>
     </>
+  );
+}
+
+function AdminPage({ navigate }) {
+  const emptyNews = { title: "", desc: "", date: "", image: "" };
+  const [password, setPassword] = useState("");
+  const [token, setToken] = useState(() => localStorage.getItem("hcfsme_admin_token") || "");
+  const [items, setItems] = useState([]);
+  const [applications, setApplications] = useState([]);
+  const [draft, setDraft] = useState(emptyNews);
+  const [editingId, setEditingId] = useState("");
+  const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
+
+  const loadAdminData = async (authToken = token) => {
+    if (!authToken) return;
+    setLoading(true);
+    try {
+      const [newsData, appData] = await Promise.all([
+        apiRequest("/api/admin/news", { token: authToken }),
+        apiRequest("/api/admin/applications", { token: authToken }),
+      ]);
+      setItems(newsData.news || []);
+      setApplications(appData.applications || []);
+    } catch (error) {
+      setMessage(error.message || "讀取後台資料失敗");
+      if (/Unauthorized|401/.test(error.message)) {
+        localStorage.removeItem("hcfsme_admin_token");
+        setToken("");
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadAdminData();
+  }, [token]);
+
+  const login = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    try {
+      const data = await apiRequest("/api/admin/login", {
+        method: "POST",
+        body: JSON.stringify({ password }),
+      });
+      localStorage.setItem("hcfsme_admin_token", data.token);
+      setToken(data.token);
+      setPassword("");
+      setMessage("登入成功");
+    } catch (error) {
+      setMessage(error.message || "登入失敗");
+    }
+  };
+
+  const saveNews = async (event) => {
+    event.preventDefault();
+    setMessage("");
+    try {
+      if (editingId) {
+        await apiRequest(`/api/admin/news/${editingId}`, {
+          method: "PUT",
+          token,
+          body: JSON.stringify(draft),
+        });
+        setMessage("新聞已更新");
+      } else {
+        await apiRequest("/api/admin/news", {
+          method: "POST",
+          token,
+          body: JSON.stringify(draft),
+        });
+        setMessage("新聞已新增");
+      }
+      setDraft(emptyNews);
+      setEditingId("");
+      await loadAdminData();
+    } catch (error) {
+      setMessage(error.message || "保存失敗");
+    }
+  };
+
+  const editNews = (item) => {
+    setEditingId(item.id);
+    setDraft({ title: item.title || "", desc: item.desc || "", date: item.date || "", image: item.image || "" });
+  };
+
+  const deleteNews = async (id) => {
+    setMessage("");
+    try {
+      await apiRequest(`/api/admin/news/${id}`, { method: "DELETE", token });
+      setMessage("新聞已刪除");
+      await loadAdminData();
+    } catch (error) {
+      setMessage(error.message || "刪除失敗");
+    }
+  };
+
+  const logout = () => {
+    localStorage.removeItem("hcfsme_admin_token");
+    setToken("");
+    setItems([]);
+    setApplications([]);
+  };
+
+  if (!token) {
+    return (
+      <section className="admin-shell">
+        <div className="admin-login">
+          <button className="text-button" onClick={() => navigate("/")}>返回網站</button>
+          <h1>港中聯網站後台</h1>
+          <p>請輸入部署時設定的後台密碼。</p>
+          <form onSubmit={login}>
+            <label>後台密碼<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
+            <button className="primary" type="submit">登入後台</button>
+          </form>
+          {message ? <p className="form-status">{message}</p> : null}
+        </div>
+      </section>
+    );
+  }
+
+  return (
+    <section className="admin-shell">
+      <div className="admin-top">
+        <div>
+          <p className="kicker">HCFSME Admin</p>
+          <h1>網站後台</h1>
+          <p>管理新聞內容，查看線上入會預登記資料。</p>
+        </div>
+        <div>
+          <button className="secondary" onClick={() => navigate("/")}>返回網站</button>
+          <button className="secondary" onClick={logout}>登出</button>
+        </div>
+      </div>
+
+      {message ? <p className="form-status admin-message">{message}</p> : null}
+
+      <section className="admin-grid">
+        <form className="admin-panel admin-form" onSubmit={saveNews}>
+          <h2>{editingId ? "編輯新聞" : "新增新聞"}</h2>
+          <label>標題<input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} required /></label>
+          <label>日期<input value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} placeholder="2026 年 6 月 24 日" /></label>
+          <label>圖片 URL<input value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="https://..." /></label>
+          <label>摘要<textarea value={draft.desc} onChange={(event) => setDraft({ ...draft, desc: event.target.value })} rows={5} /></label>
+          <div className="admin-actions">
+            <button className="primary" type="submit">{editingId ? "保存修改" : "新增新聞"}</button>
+            {editingId ? <button className="secondary" type="button" onClick={() => { setEditingId(""); setDraft(emptyNews); }}>取消編輯</button> : null}
+          </div>
+        </form>
+
+        <div className="admin-panel">
+          <div className="admin-panel-head">
+            <h2>新聞列表</h2>
+            <button className="text-button" onClick={() => loadAdminData()}>{loading ? "刷新中" : "刷新"}</button>
+          </div>
+          <div className="admin-list">
+            {items.map((item) => (
+              <article key={item.id}>
+                <div>
+                  <h3>{item.title}</h3>
+                  <p>{item.date}</p>
+                </div>
+                <div>
+                  <button className="text-button" onClick={() => editNews(item)}>編輯</button>
+                  <button className="text-button danger" onClick={() => deleteNews(item.id)}>刪除</button>
+                </div>
+              </article>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      <section className="admin-panel applications-panel">
+        <div className="admin-panel-head">
+          <h2>入會預登記</h2>
+          <span>{applications.length} 筆</span>
+        </div>
+        <div className="application-table">
+          {applications.map((item) => (
+            <article key={item.id}>
+              <strong>{item.name}</strong>
+              <span>{item.company || "未填公司"}</span>
+              <span>{item.role || "未填職位"}</span>
+              <span>{item.phone}</span>
+              <span>{item.email || "未填電郵"}</span>
+              <p>{item.interest || "未填感興趣服務"}</p>
+            </article>
+          ))}
+          {!applications.length ? <p>暫無預登記資料。</p> : null}
+        </div>
+      </section>
+    </section>
   );
 }
 

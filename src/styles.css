@@ -51,6 +51,11 @@ button {
   cursor: pointer;
 }
 
+button:disabled {
+  cursor: not-allowed;
+  opacity: 0.65;
+}
+
 img {
   max-width: 100%;
   display: block;
@@ -981,6 +986,190 @@ h3 {
   padding: 0 14px;
 }
 
+.form-status {
+  margin-top: 18px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.admin-shell {
+  min-height: 100dvh;
+  padding: 40px 28px 72px;
+  background:
+    linear-gradient(135deg, color-mix(in srgb, var(--accent-soft) 70%, transparent), transparent 38%),
+    var(--bg);
+}
+
+.admin-login,
+.admin-top,
+.admin-grid,
+.applications-panel {
+  max-width: 1180px;
+  margin: 0 auto;
+}
+
+.admin-login {
+  min-height: calc(100dvh - 112px);
+  display: grid;
+  align-content: center;
+  max-width: 560px;
+}
+
+.admin-login h1,
+.admin-top h1 {
+  margin: 18px 0 12px;
+  font-size: clamp(42px, 7vw, 78px);
+  line-height: 1;
+}
+
+.admin-login p,
+.admin-top p,
+.admin-list p,
+.application-table span,
+.application-table p {
+  color: var(--muted);
+  line-height: 1.7;
+}
+
+.admin-login form,
+.admin-panel,
+.admin-message {
+  background: var(--surface);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+}
+
+.admin-login form {
+  margin-top: 24px;
+  padding: 26px;
+  display: grid;
+  gap: 18px;
+}
+
+.admin-top {
+  display: flex;
+  align-items: end;
+  justify-content: space-between;
+  gap: 24px;
+  margin-bottom: 28px;
+}
+
+.admin-top > div:last-child {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.admin-message {
+  max-width: 1180px;
+  margin: 0 auto 18px;
+  padding: 16px 20px;
+}
+
+.admin-grid {
+  display: grid;
+  grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
+  gap: 18px;
+}
+
+.admin-panel {
+  padding: 28px;
+}
+
+.admin-panel h2 {
+  font-size: clamp(28px, 4vw, 42px);
+}
+
+.admin-form {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.admin-form label,
+.admin-login label {
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 700;
+}
+
+.admin-form input,
+.admin-form textarea,
+.admin-login input {
+  width: 100%;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  padding: 12px 14px;
+}
+
+.admin-form textarea {
+  resize: vertical;
+}
+
+.admin-actions,
+.admin-panel-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 14px;
+  flex-wrap: wrap;
+}
+
+.admin-list {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.admin-list article {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 18px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.admin-list h3 {
+  font-size: 18px;
+  line-height: 1.35;
+}
+
+.admin-list article > div:last-child {
+  display: flex;
+  align-items: start;
+  gap: 12px;
+}
+
+.danger {
+  color: #b42318;
+}
+
+.applications-panel {
+  margin-top: 18px;
+}
+
+.application-table {
+  display: grid;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.application-table article {
+  display: grid;
+  grid-template-columns: 1fr 1fr 0.8fr 0.9fr 1.1fr;
+  gap: 12px;
+  padding: 16px 0;
+  border-top: 1px solid var(--line);
+}
+
+.application-table p {
+  grid-column: 1 / -1;
+  margin: 0;
+}
+
 .industry-icons {
   display: grid;
   grid-template-columns: repeat(8, minmax(0, 1fr));
@@ -1203,8 +1392,13 @@ h3 {
   .membership,
   .mission-list,
   .org-overview,
-  .application-panel {
+  .application-panel,
+  .admin-grid {
     grid-template-columns: 1fr;
+  }
+
+  .application-table article {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .page-hero img {
@@ -1360,10 +1554,15 @@ h3 {
 
   .contact-prompt,
   .subscribe-panel,
+  .admin-top,
   .section-heading {
     align-items: stretch;
     flex-direction: column;
     padding: 28px;
+  }
+
+  .admin-top {
+    padding: 0;
   }
 
   .section-heading {
@@ -1381,5 +1580,14 @@ h3 {
   .application-panel label.full,
   .application-panel button {
     grid-column: auto;
+  }
+
+  .admin-shell {
+    padding: 28px 16px 56px;
+  }
+
+  .admin-list article,
+  .application-table article {
+    grid-template-columns: 1fr;
   }
 }
