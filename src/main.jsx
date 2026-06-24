@@ -1,4 +1,4 @@
-import React, { useEffect, useMemo, useRef, useState } from "react";
+import React, { createContext, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { createRoot } from "react-dom/client";
 import { gsap } from "gsap";
 import { useGSAP } from "@gsap/react";
@@ -22,6 +22,8 @@ import {
 import "./styles.css";
 
 gsap.registerPlugin(useGSAP, ScrollTrigger);
+
+const ContentContext = createContext(null);
 
 const image = {
   logo: "https://www.hcfsme.org/wp-content/uploads/2024/03/K3.png",
@@ -292,13 +294,6 @@ const downloads = [
   ["活動相冊", "商會活動影像記錄與年度回顧。", "/photo"],
 ];
 
-const defaultEditableContent = {
-  contact,
-  coreServices,
-  memberBenefits,
-  downloads,
-};
-
 const directors = [
   ["譚耀泉 Sam Tam", "指導主席"],
   ["蔣文凱 Elisa", "會董會主席"],
@@ -391,7 +386,7 @@ const legalPages = {
 };
 
 const pages = {
-  "/": { title: "商源香江 惠通全球", subtitle: "香港中小企業工商聯合會" },
+  "/": { title: "商源香江 惠通全球", subtitle: "香港中小企業工商聯合會以香港為樞紐，服務及支援全球華人地區中小企業。" },
   "/about": { title: "關於港中聯", subtitle: "香港特區政府認可及支持的非牟利工商團體" },
   "/intro": { title: "商會簡介", subtitle: "立足香港，背靠祖國，聯通世界" },
   "/charter": { title: "商會章程", subtitle: "會員體系、會務治理與組織運作準則" },
@@ -416,6 +411,78 @@ const pages = {
   "/subscribe": { title: "訂閱我們", subtitle: "收取更多本會宣傳資訊與 Newsletter" },
   "/admin": { title: "網站後台", subtitle: "內容管理與入會預登記資料" },
 };
+
+const pageNames = {
+  "/": "首頁",
+  "/about": "關於港中聯",
+  "/intro": "商會簡介",
+  "/charter": "商會章程",
+  "/structure": "組織架構",
+  "/directors": "會董暨名譽職務",
+  "/services": "商會服務",
+  "/industry": "行業委員會",
+  "/activities": "商會活動",
+  "/news": "新聞動態",
+  "/photo": "商會相冊",
+  "/member-services": "會員服務",
+  "/member-benefits": "會員類別及權益",
+  "/membership": "入會須知",
+  "/application": "線上入會預登記",
+  "/agreement": "會員服務協議",
+  "/certification": "實名認證協議",
+  "/protection": "資訊保護政策",
+  "/resources": "資訊中心",
+  "/announcements": "公告",
+  "/downloads": "資源下載",
+  "/contact": "聯絡我們",
+  "/subscribe": "訂閱我們",
+};
+
+const editablePagePaths = Object.keys(pageNames);
+
+const defaultPageContent = Object.fromEntries(
+  editablePagePaths.map((path) => [
+    path,
+    {
+      title: pages[path]?.title || pageNames[path],
+      subtitle: pages[path]?.subtitle || "",
+      imageUrl: "",
+      blocks: [],
+    },
+  ]),
+);
+
+const defaultEditableContent = {
+  contact,
+  coreServices,
+  memberBenefits,
+  downloads,
+  pages: defaultPageContent,
+};
+
+function mergeEditableContent(input = {}) {
+  const inputPages = input.pages || {};
+  const pagesWithDefaults = Object.fromEntries(
+    editablePagePaths.map((path) => [
+      path,
+      {
+        ...defaultPageContent[path],
+        ...(inputPages[path] || {}),
+        blocks: Array.isArray(inputPages[path]?.blocks) ? inputPages[path].blocks : [],
+      },
+    ]),
+  );
+
+  return {
+    ...defaultEditableContent,
+    ...input,
+    contact: { ...contact, ...(input.contact || {}) },
+    coreServices: Array.isArray(input.coreServices) ? input.coreServices : coreServices,
+    memberBenefits: Array.isArray(input.memberBenefits) ? input.memberBenefits : memberBenefits,
+    downloads: Array.isArray(input.downloads) ? input.downloads : downloads,
+    pages: pagesWithDefaults,
+  };
+}
 
 function normalizePath(path) {
   if (!path || path === "/index.html") return "/";
@@ -463,7 +530,7 @@ function App() {
 
   useEffect(() => {
     apiRequest("/api/content")
-      .then((data) => setContent({ ...defaultEditableContent, ...(data.content || {}) }))
+      .then((data) => setContent(mergeEditableContent(data.content || {})))
       .catch(() => setContent(defaultEditableContent));
   }, []);
 
@@ -652,13 +719,15 @@ function App() {
   }, { dependencies: [path], scope: appRef, revertOnUpdate: true });
 
   return (
-    <div ref={appRef}>
+    <ContentContext.Provider value={content}>
+      <div ref={appRef}>
       {!isAdmin ? <Header path={path} navigate={navigate} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} siteContact={siteContact} /> : null}
       <main>
         <RenderPage path={path} navigate={navigate} content={content} siteContact={siteContact} />
       </main>
       {!isAdmin ? <Footer navigate={navigate} siteContact={siteContact} /> : null}
-    </div>
+      </div>
+    </ContentContext.Provider>
   );
 }
 
@@ -714,53 +783,101 @@ function Header({ path, navigate, mobileOpen, setMobileOpen, siteContact }) {
 }
 
 function RenderPage({ path, navigate, content, siteContact }) {
-  if (path === "/") return <Home navigate={navigate} />;
-  if (path === "/about") return <AboutPage navigate={navigate} />;
-  if (path === "/intro") return <IntroPage />;
-  if (path === "/charter") return <CharterPage />;
-  if (path === "/structure") return <StructurePage />;
-  if (path === "/directors") return <DirectorsPage />;
-  if (path === "/services") return <ServicesPage content={content} />;
-  if (path === "/industry") return <IndustryPage />;
-  if (path === "/activities") return <ActivitiesPage navigate={navigate} />;
-  if (path === "/news") return <NewsPage />;
-  if (path === "/photo") return <PhotoPage />;
-  if (path === "/member-services") return <MemberServices navigate={navigate} />;
-  if (path === "/member-benefits") return <MemberBenefitsPage content={content} />;
-  if (path === "/membership") return <MembershipPage />;
-  if (path === "/application") return <ApplicationPage />;
-  if (["/agreement", "/certification", "/protection"].includes(path)) return <LegalPage data={pages[path]} />;
-  if (path === "/resources") return <ResourcesPage navigate={navigate} />;
-  if (path === "/announcements") return <AnnouncementsPage />;
-  if (path === "/downloads") return <DownloadsPage navigate={navigate} content={content} />;
-  if (path === "/contact") return <ContactPage siteContact={siteContact} />;
-  if (path === "/subscribe") return <SubscribePage />;
+  let page = null;
+  if (path === "/") page = <Home navigate={navigate} />;
+  if (path === "/about") page = <AboutPage navigate={navigate} />;
+  if (path === "/intro") page = <IntroPage />;
+  if (path === "/charter") page = <CharterPage />;
+  if (path === "/structure") page = <StructurePage />;
+  if (path === "/directors") page = <DirectorsPage />;
+  if (path === "/services") page = <ServicesPage content={content} />;
+  if (path === "/industry") page = <IndustryPage />;
+  if (path === "/activities") page = <ActivitiesPage navigate={navigate} />;
+  if (path === "/news") page = <NewsPage />;
+  if (path === "/photo") page = <PhotoPage />;
+  if (path === "/member-services") page = <MemberServices navigate={navigate} />;
+  if (path === "/member-benefits") page = <MemberBenefitsPage content={content} />;
+  if (path === "/membership") page = <MembershipPage />;
+  if (path === "/application") page = <ApplicationPage />;
+  if (["/agreement", "/certification", "/protection"].includes(path)) page = <LegalPage data={pages[path]} />;
+  if (path === "/resources") page = <ResourcesPage navigate={navigate} />;
+  if (path === "/announcements") page = <AnnouncementsPage />;
+  if (path === "/downloads") page = <DownloadsPage navigate={navigate} content={content} />;
+  if (path === "/contact") page = <ContactPage siteContact={siteContact} />;
+  if (path === "/subscribe") page = <SubscribePage />;
   if (path === "/admin") return <AdminPage navigate={navigate} />;
-  return <Home navigate={navigate} />;
+  return (
+    <>
+      {page || <Home navigate={navigate} />}
+      <EditablePageBlocks path={path} />
+    </>
+  );
 }
 
 function PageHero({ title, subtitle, imageUrl = image.meeting }) {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const matchedPath = Object.entries(pages).find(([, page]) => page.title === title)?.[0];
+  const pageContent = matchedPath ? content.pages?.[matchedPath] : null;
+  const heroTitle = pageContent?.title || title;
+  const heroSubtitle = pageContent?.subtitle || subtitle;
+  const heroImage = pageContent?.imageUrl || imageUrl;
+
   return (
     <section className="page-hero">
       <div>
         <p className="kicker">HCFSME</p>
-        <h1>{title}</h1>
-        <p>{subtitle}</p>
+        <h1>{heroTitle}</h1>
+        <p>{heroSubtitle}</p>
       </div>
-      <img src={imageUrl} alt="" />
+      <img src={heroImage} alt="" />
+    </section>
+  );
+}
+
+function EditablePageBlocks({ path }) {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const blocks = (content.pages?.[path]?.blocks || []).filter((block) => block?.title || block?.body || block?.imageUrl || block?.items);
+
+  if (!blocks.length) return null;
+
+  return (
+    <section className="section editable-blocks">
+      {blocks.map((block, index) => {
+        const items = String(block.items || "")
+          .split("\n")
+          .map((item) => item.trim())
+          .filter(Boolean);
+        return (
+          <article key={`${block.title || "block"}-${index}`}>
+            {block.imageUrl ? <img src={block.imageUrl} alt="" /> : null}
+            <div>
+              {block.kicker ? <p className="kicker">{block.kicker}</p> : null}
+              {block.title ? <h2>{block.title}</h2> : null}
+              {block.body ? <p>{block.body}</p> : null}
+              {items.length ? (
+                <ul>
+                  {items.map((item) => <li key={item}>{item}</li>)}
+                </ul>
+              ) : null}
+            </div>
+          </article>
+        );
+      })}
     </section>
   );
 }
 
 function Home({ navigate }) {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const homeContent = content.pages?.["/"] || defaultPageContent["/"];
   return (
     <>
       <section className="home-hero">
         <div className="hero-copy">
           <p className="kicker">HCFSME since 1998</p>
-          <h1>商源香江 惠通全球</h1>
+          <h1>{homeContent.title || pages["/"].title}</h1>
           <p>
-            香港中小企業工商聯合會以香港為樞紐，服務及支援全球華人地區中小企業。
+            {homeContent.subtitle || pages["/"].subtitle}
           </p>
           <div className="hero-actions">
             <button className="primary" onClick={() => navigate("/membership")}>
@@ -772,7 +889,7 @@ function Home({ navigate }) {
           </div>
         </div>
         <figure className="hero-image">
-          <img src={image.hero} alt="港中聯活動現場" />
+          <img src={homeContent.imageUrl || image.hero} alt="港中聯活動現場" />
         </figure>
       </section>
 
@@ -1511,9 +1628,38 @@ function AdminPage({ navigate }) {
       refreshing: "刷新中",
       edit: "編輯",
       delete: "刪除",
-      contentConfig: "網站內容配置",
-      contentHelp: "可修改聯絡方式、商會服務、會員權益、下載入口等內容。格式需保持合法 JSON。",
-      saveContent: "保存內容配置",
+      newsTab: "新聞管理",
+      pagesTab: "頁面內容",
+      settingsTab: "全站設定",
+      applicationsTab: "入會記錄",
+      pageContent: "頁面內容",
+      pageContentHelp: "選擇頁面後，可修改首屏標題、副標題、頭圖，並添加頁面內容區塊。",
+      siteSettings: "全站設定",
+      siteSettingsHelp: "維護聯絡方式、商會服務、會員權益與資源下載入口。",
+      saveContent: "保存內容",
+      selectPage: "選擇頁面",
+      heroTitle: "首屏標題",
+      heroSubtitle: "首屏副標題",
+      heroImage: "首屏圖片",
+      addBlock: "新增內容區塊",
+      blockTitle: "區塊標題",
+      blockKicker: "小標籤",
+      blockBody: "區塊正文",
+      blockItems: "要點列表（每行一條）",
+      removeBlock: "刪除區塊",
+      contactSettings: "聯絡方式",
+      phone: "電話",
+      email: "電郵",
+      addressZh: "中文地址",
+      addressEn: "英文地址",
+      serviceSettings: "商會服務",
+      serviceValue: "服務價值說明",
+      serviceItems: "服務項目（每行格式：標題｜說明）",
+      addService: "新增服務板塊",
+      removeService: "刪除服務板塊",
+      benefitsSettings: "會員權益",
+      downloadsSettings: "資源下載",
+      addItem: "新增一項",
       applications: "入會預登記",
       records: "筆",
       emptyApplications: "暫無預登記資料。",
@@ -1524,6 +1670,7 @@ function AdminPage({ navigate }) {
       newsDeleted: "新聞已刪除",
       contentSaved: "網站內容已保存",
       uploadOk: "圖片已上傳並填入圖片欄位",
+      imageUploaded: "圖片已上傳",
     },
     en: {
       back: "Back to site",
@@ -1549,9 +1696,38 @@ function AdminPage({ navigate }) {
       refreshing: "Refreshing",
       edit: "Edit",
       delete: "Delete",
-      contentConfig: "Site content config",
-      contentHelp: "Edit contact info, services, member benefits, downloads, and other editable content. Keep valid JSON.",
-      saveContent: "Save content config",
+      newsTab: "News",
+      pagesTab: "Pages",
+      settingsTab: "Site settings",
+      applicationsTab: "Applications",
+      pageContent: "Page content",
+      pageContentHelp: "Select a page to edit its hero title, subtitle, image, and add content blocks.",
+      siteSettings: "Site settings",
+      siteSettingsHelp: "Maintain contact info, services, member benefits, and download links.",
+      saveContent: "Save content",
+      selectPage: "Select page",
+      heroTitle: "Hero title",
+      heroSubtitle: "Hero subtitle",
+      heroImage: "Hero image",
+      addBlock: "Add content block",
+      blockTitle: "Block title",
+      blockKicker: "Small label",
+      blockBody: "Block body",
+      blockItems: "Bullet list, one item per line",
+      removeBlock: "Remove block",
+      contactSettings: "Contact info",
+      phone: "Phone",
+      email: "Email",
+      addressZh: "Chinese address",
+      addressEn: "English address",
+      serviceSettings: "Services",
+      serviceValue: "Service value",
+      serviceItems: "Service items, one per line: title｜description",
+      addService: "Add service group",
+      removeService: "Remove service group",
+      benefitsSettings: "Member benefits",
+      downloadsSettings: "Downloads",
+      addItem: "Add item",
       applications: "Applications",
       records: "records",
       emptyApplications: "No applications yet.",
@@ -1562,6 +1738,7 @@ function AdminPage({ navigate }) {
       newsDeleted: "News deleted",
       contentSaved: "Site content saved",
       uploadOk: "Image uploaded and inserted",
+      imageUploaded: "Image uploaded",
     },
   };
   const [password, setPassword] = useState("");
@@ -1569,7 +1746,9 @@ function AdminPage({ navigate }) {
   const [lang, setLang] = useState(() => localStorage.getItem("hcfsme_admin_lang") || "zh");
   const [items, setItems] = useState([]);
   const [applications, setApplications] = useState([]);
-  const [contentDraft, setContentDraft] = useState(JSON.stringify(defaultEditableContent, null, 2));
+  const [contentForm, setContentForm] = useState(defaultEditableContent);
+  const [activeTab, setActiveTab] = useState("news");
+  const [selectedPage, setSelectedPage] = useState("/");
   const [draft, setDraft] = useState(emptyNews);
   const [editingId, setEditingId] = useState("");
   const [message, setMessage] = useState("");
@@ -1595,7 +1774,7 @@ function AdminPage({ navigate }) {
       ]);
       setItems(newsData.news || []);
       setApplications(appData.applications || []);
-      setContentDraft(JSON.stringify({ ...defaultEditableContent, ...(contentData.content || {}) }, null, 2));
+      setContentForm(mergeEditableContent(contentData.content || {}));
     } catch (error) {
       setMessage(error.message || "讀取後台資料失敗");
       if (/Unauthorized|401/.test(error.message)) {
@@ -1678,42 +1857,144 @@ function AdminPage({ navigate }) {
   const saveContent = async () => {
     setMessage("");
     try {
-      const parsed = JSON.parse(contentDraft);
       await apiRequest("/api/admin/content", {
         method: "PUT",
         token,
-        body: JSON.stringify({ content: parsed }),
+        body: JSON.stringify({ content: contentForm }),
       });
       setMessage(t.contentSaved);
       await loadAdminData();
     } catch (error) {
-      setMessage(error.message || "內容保存失敗，請檢查 JSON 格式");
+      setMessage(error.message || "內容保存失敗");
     }
   };
 
-  const uploadImage = async (event) => {
+  const uploadFile = async (file) => {
+    const dataUrl = await new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+    return apiRequest("/api/admin/upload", {
+      method: "POST",
+      token,
+      body: JSON.stringify({ filename: file.name, dataUrl }),
+    });
+  };
+
+  const uploadImage = async (event, applyUrl) => {
     const file = event.target.files?.[0];
     if (!file) return;
     setMessage("");
     try {
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
-      const data = await apiRequest("/api/admin/upload", {
-        method: "POST",
-        token,
-        body: JSON.stringify({ filename: file.name, dataUrl }),
-      });
-      setDraft((current) => ({ ...current, image: data.url }));
-      setMessage(t.uploadOk);
+      const data = await uploadFile(file);
+      if (applyUrl) {
+        applyUrl(data.url);
+        setMessage(t.imageUploaded);
+      } else {
+        setDraft((current) => ({ ...current, image: data.url }));
+        setMessage(t.uploadOk);
+      }
     } catch (error) {
       setMessage(error.message || "圖片上傳失敗");
     } finally {
       event.target.value = "";
     }
+  };
+
+  const updateContent = (updater) => {
+    setContentForm((current) => mergeEditableContent(typeof updater === "function" ? updater(current) : updater));
+  };
+
+  const updatePage = (path, patch) => {
+    updateContent((current) => ({
+      ...current,
+      pages: {
+        ...current.pages,
+        [path]: { ...current.pages[path], ...patch },
+      },
+    }));
+  };
+
+  const updatePageBlock = (path, index, patch) => {
+    updateContent((current) => {
+      const blocks = [...(current.pages[path]?.blocks || [])];
+      blocks[index] = { ...blocks[index], ...patch };
+      return {
+        ...current,
+        pages: {
+          ...current.pages,
+          [path]: { ...current.pages[path], blocks },
+        },
+      };
+    });
+  };
+
+  const addPageBlock = (path) => {
+    updateContent((current) => ({
+      ...current,
+      pages: {
+        ...current.pages,
+        [path]: {
+          ...current.pages[path],
+          blocks: [...(current.pages[path]?.blocks || []), { kicker: "", title: "", body: "", items: "", imageUrl: "" }],
+        },
+      },
+    }));
+  };
+
+  const removePageBlock = (path, index) => {
+    updateContent((current) => ({
+      ...current,
+      pages: {
+        ...current.pages,
+        [path]: {
+          ...current.pages[path],
+          blocks: (current.pages[path]?.blocks || []).filter((_, itemIndex) => itemIndex !== index),
+        },
+      },
+    }));
+  };
+
+  const updateService = (index, patch) => {
+    updateContent((current) => {
+      const coreServicesDraft = [...(current.coreServices || [])];
+      coreServicesDraft[index] = { ...coreServicesDraft[index], ...patch };
+      return { ...current, coreServices: coreServicesDraft };
+    });
+  };
+
+  const addService = () => {
+    updateContent((current) => ({
+      ...current,
+      coreServices: [...(current.coreServices || []), { title: "", value: "", items: [["", ""]] }],
+    }));
+  };
+
+  const removeService = (index) => {
+    updateContent((current) => ({
+      ...current,
+      coreServices: (current.coreServices || []).filter((_, itemIndex) => itemIndex !== index),
+    }));
+  };
+
+  const updatePairList = (key, index, valueIndex, value) => {
+    updateContent((current) => {
+      const list = [...(current[key] || [])];
+      const item = [...(list[index] || [])];
+      item[valueIndex] = value;
+      list[index] = item;
+      return { ...current, [key]: list };
+    });
+  };
+
+  const addPairListItem = (key, item) => {
+    updateContent((current) => ({ ...current, [key]: [...(current[key] || []), item] }));
+  };
+
+  const removePairListItem = (key, index) => {
+    updateContent((current) => ({ ...current, [key]: (current[key] || []).filter((_, itemIndex) => itemIndex !== index) }));
   };
 
   const logout = () => {
@@ -1760,75 +2041,230 @@ function AdminPage({ navigate }) {
 
       {message ? <p className="form-status admin-message">{message}</p> : null}
 
-      <section className="admin-grid">
-        <form className="admin-panel admin-form" onSubmit={saveNews}>
-          <h2>{editingId ? t.editNews : t.newNews}</h2>
-          <label>{t.title}<input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} required /></label>
-          <label>{t.date}<input value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} placeholder="2026 年 6 月 24 日" /></label>
-          <label>{t.imageUrl}<input value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="https://..." /></label>
-          <label className="upload-button">
-            {t.uploadImage}
-            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={uploadImage} />
-          </label>
-          <label>{t.summary}<textarea value={draft.desc} onChange={(event) => setDraft({ ...draft, desc: event.target.value })} rows={5} /></label>
-          <div className="admin-actions">
-            <button className="primary" type="submit">{editingId ? t.save : t.create}</button>
-            {editingId ? <button className="secondary" type="button" onClick={() => { setEditingId(""); setDraft(emptyNews); }}>{t.cancel}</button> : null}
-          </div>
-        </form>
+      <nav className="admin-tabs" aria-label="後台分欄">
+        {[
+          ["news", t.newsTab],
+          ["pages", t.pagesTab],
+          ["settings", t.settingsTab],
+          ["applications", t.applicationsTab],
+        ].map(([key, label]) => (
+          <button key={key} className={activeTab === key ? "is-active" : ""} onClick={() => setActiveTab(key)}>{label}</button>
+        ))}
+      </nav>
 
-        <div className="admin-panel">
-          <div className="admin-panel-head">
-            <h2>{t.newsList}</h2>
-            <button className="text-button" onClick={() => loadAdminData()}>{loading ? t.refreshing : t.refresh}</button>
+      {activeTab === "news" ? (
+        <section className="admin-grid">
+          <form className="admin-panel admin-form" onSubmit={saveNews}>
+            <h2>{editingId ? t.editNews : t.newNews}</h2>
+            <label>{t.title}<input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} required /></label>
+            <label>{t.date}<input value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} placeholder="2026 年 6 月 24 日" /></label>
+            <label>{t.imageUrl}<input value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="https://..." /></label>
+            <label className="upload-button">
+              {t.uploadImage}
+              <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={uploadImage} />
+            </label>
+            <label>{t.summary}<textarea value={draft.desc} onChange={(event) => setDraft({ ...draft, desc: event.target.value })} rows={5} /></label>
+            <div className="admin-actions">
+              <button className="primary" type="submit">{editingId ? t.save : t.create}</button>
+              {editingId ? <button className="secondary" type="button" onClick={() => { setEditingId(""); setDraft(emptyNews); }}>{t.cancel}</button> : null}
+            </div>
+          </form>
+
+          <div className="admin-panel">
+            <div className="admin-panel-head">
+              <h2>{t.newsList}</h2>
+              <button className="text-button" onClick={() => loadAdminData()}>{loading ? t.refreshing : t.refresh}</button>
+            </div>
+            <div className="admin-list">
+              {items.map((item) => (
+                <article key={item.id}>
+                  <div>
+                    <h3>{item.title}</h3>
+                    <p>{item.date}</p>
+                  </div>
+                  <div>
+                    <button className="text-button" onClick={() => editNews(item)}>{t.edit}</button>
+                    <button className="text-button danger" onClick={() => deleteNews(item.id)}>{t.delete}</button>
+                  </div>
+                </article>
+              ))}
+            </div>
           </div>
-          <div className="admin-list">
-            {items.map((item) => (
+        </section>
+      ) : null}
+
+      {activeTab === "pages" ? (
+        <section className="admin-panel content-panel">
+          <div className="admin-panel-head">
+            <div>
+              <h2>{t.pageContent}</h2>
+              <p>{t.pageContentHelp}</p>
+            </div>
+            <button className="primary" onClick={saveContent}>{t.saveContent}</button>
+          </div>
+          <div className="content-editor">
+            <aside className="page-list">
+              <label>{t.selectPage}
+                <select value={selectedPage} onChange={(event) => setSelectedPage(event.target.value)}>
+                  {editablePagePaths.map((path) => <option key={path} value={path}>{pageNames[path]}</option>)}
+                </select>
+              </label>
+              {editablePagePaths.map((path) => (
+                <button key={path} className={selectedPage === path ? "is-active" : ""} onClick={() => setSelectedPage(path)}>
+                  <span>{pageNames[path]}</span>
+                  <small>{path}</small>
+                </button>
+              ))}
+            </aside>
+
+            <div className="content-editor-main">
+              <div className="field-grid">
+                <label>{t.heroTitle}<input value={contentForm.pages[selectedPage]?.title || ""} onChange={(event) => updatePage(selectedPage, { title: event.target.value })} /></label>
+                <label>{t.heroSubtitle}<input value={contentForm.pages[selectedPage]?.subtitle || ""} onChange={(event) => updatePage(selectedPage, { subtitle: event.target.value })} /></label>
+                <label className="full">{t.heroImage}<input value={contentForm.pages[selectedPage]?.imageUrl || ""} onChange={(event) => updatePage(selectedPage, { imageUrl: event.target.value })} placeholder="https://..." /></label>
+                <label className="upload-button">
+                  {t.uploadImage}
+                  <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePage(selectedPage, { imageUrl: url }))} />
+                </label>
+              </div>
+
+              <div className="block-list">
+                {(contentForm.pages[selectedPage]?.blocks || []).map((block, index) => (
+                  <article className="content-block-editor" key={`${selectedPage}-${index}`}>
+                    <div className="admin-panel-head">
+                      <h3>{t.addBlock} {index + 1}</h3>
+                      <button className="text-button danger" onClick={() => removePageBlock(selectedPage, index)}>{t.removeBlock}</button>
+                    </div>
+                    <div className="field-grid">
+                      <label>{t.blockKicker}<input value={block.kicker || ""} onChange={(event) => updatePageBlock(selectedPage, index, { kicker: event.target.value })} /></label>
+                      <label>{t.blockTitle}<input value={block.title || ""} onChange={(event) => updatePageBlock(selectedPage, index, { title: event.target.value })} /></label>
+                      <label className="full">{t.blockBody}<textarea rows={4} value={block.body || ""} onChange={(event) => updatePageBlock(selectedPage, index, { body: event.target.value })} /></label>
+                      <label className="full">{t.blockItems}<textarea rows={4} value={block.items || ""} onChange={(event) => updatePageBlock(selectedPage, index, { items: event.target.value })} /></label>
+                      <label className="full">{t.imageUrl}<input value={block.imageUrl || ""} onChange={(event) => updatePageBlock(selectedPage, index, { imageUrl: event.target.value })} placeholder="https://..." /></label>
+                      <label className="upload-button">
+                        {t.uploadImage}
+                        <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePageBlock(selectedPage, index, { imageUrl: url }))} />
+                      </label>
+                    </div>
+                  </article>
+                ))}
+                <button className="secondary" onClick={() => addPageBlock(selectedPage)}>{t.addBlock}</button>
+              </div>
+            </div>
+          </div>
+        </section>
+      ) : null}
+
+      {activeTab === "settings" ? (
+        <section className="admin-panel content-panel">
+          <div className="admin-panel-head">
+            <div>
+              <h2>{t.siteSettings}</h2>
+              <p>{t.siteSettingsHelp}</p>
+            </div>
+            <button className="primary" onClick={saveContent}>{t.saveContent}</button>
+          </div>
+
+          <div className="settings-grid">
+            <section className="settings-card">
+              <h3>{t.contactSettings}</h3>
+              <div className="field-grid single">
+                {["phone", "email", "addressZh", "addressEn"].map((key) => (
+                  <label key={key}>{t[key]}<input value={contentForm.contact?.[key] || ""} onChange={(event) => updateContent((current) => ({ ...current, contact: { ...current.contact, [key]: event.target.value } }))} /></label>
+                ))}
+              </div>
+            </section>
+
+            <section className="settings-card wide">
+              <div className="admin-panel-head">
+                <h3>{t.serviceSettings}</h3>
+                <button className="text-button" onClick={addService}>{t.addService}</button>
+              </div>
+              <div className="nested-list">
+                {(contentForm.coreServices || []).map((service, index) => (
+                  <article key={`${service.title}-${index}`}>
+                    <div className="admin-panel-head">
+                      <h4>{service.title || `${t.serviceSettings} ${index + 1}`}</h4>
+                      <button className="text-button danger" onClick={() => removeService(index)}>{t.removeService}</button>
+                    </div>
+                    <div className="field-grid">
+                      <label>{t.title}<input value={service.title || ""} onChange={(event) => updateService(index, { title: event.target.value })} /></label>
+                      <label>{t.serviceValue}<input value={service.value || ""} onChange={(event) => updateService(index, { value: event.target.value })} /></label>
+                      <label className="full">{t.serviceItems}
+                        <textarea
+                          rows={5}
+                          value={(service.items || []).map(([itemTitle, itemDesc]) => `${itemTitle || ""}｜${itemDesc || ""}`).join("\n")}
+                          onChange={(event) => updateService(index, {
+                            items: event.target.value.split("\n").map((line) => {
+                              const [itemTitle = "", itemDesc = ""] = line.split("｜");
+                              return [itemTitle.trim(), itemDesc.trim()];
+                            }).filter(([itemTitle, itemDesc]) => itemTitle || itemDesc),
+                          })}
+                        />
+                      </label>
+                    </div>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="settings-card">
+              <div className="admin-panel-head">
+                <h3>{t.benefitsSettings}</h3>
+                <button className="text-button" onClick={() => addPairListItem("memberBenefits", ["", ""])}>{t.addItem}</button>
+              </div>
+              <div className="nested-list compact">
+                {(contentForm.memberBenefits || []).map((item, index) => (
+                  <article key={`${item[0]}-${index}`}>
+                    <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList("memberBenefits", index, 0, event.target.value)} /></label>
+                    <label>{t.summary}<textarea rows={3} value={item[1] || ""} onChange={(event) => updatePairList("memberBenefits", index, 1, event.target.value)} /></label>
+                    <button className="text-button danger" onClick={() => removePairListItem("memberBenefits", index)}>{t.delete}</button>
+                  </article>
+                ))}
+              </div>
+            </section>
+
+            <section className="settings-card">
+              <div className="admin-panel-head">
+                <h3>{t.downloadsSettings}</h3>
+                <button className="text-button" onClick={() => addPairListItem("downloads", ["", "", "/"])}>{t.addItem}</button>
+              </div>
+              <div className="nested-list compact">
+                {(contentForm.downloads || []).map((item, index) => (
+                  <article key={`${item[0]}-${index}`}>
+                    <label>{t.title}<input value={item[0] || ""} onChange={(event) => updatePairList("downloads", index, 0, event.target.value)} /></label>
+                    <label>{t.summary}<textarea rows={3} value={item[1] || ""} onChange={(event) => updatePairList("downloads", index, 1, event.target.value)} /></label>
+                    <label>URL<input value={item[2] || ""} onChange={(event) => updatePairList("downloads", index, 2, event.target.value)} /></label>
+                    <button className="text-button danger" onClick={() => removePairListItem("downloads", index)}>{t.delete}</button>
+                  </article>
+                ))}
+              </div>
+            </section>
+          </div>
+        </section>
+      ) : null}
+
+      {activeTab === "applications" ? (
+        <section className="admin-panel applications-panel">
+          <div className="admin-panel-head">
+            <h2>{t.applications}</h2>
+            <span>{applications.length} {t.records}</span>
+          </div>
+          <div className="application-table">
+            {applications.map((item) => (
               <article key={item.id}>
-                <div>
-                  <h3>{item.title}</h3>
-                  <p>{item.date}</p>
-                </div>
-                <div>
-                  <button className="text-button" onClick={() => editNews(item)}>{t.edit}</button>
-                  <button className="text-button danger" onClick={() => deleteNews(item.id)}>{t.delete}</button>
-                </div>
+                <strong>{item.name}</strong>
+                <span>{item.company || "未填公司"}</span>
+                <span>{item.role || "未填職位"}</span>
+                <span>{item.phone}</span>
+                <span>{item.email || "未填電郵"}</span>
+                <p>{item.interest || "未填感興趣服務"}</p>
               </article>
             ))}
+            {!applications.length ? <p>{t.emptyApplications}</p> : null}
           </div>
-        </div>
-      </section>
-
-      <section className="admin-panel content-panel">
-        <div className="admin-panel-head">
-          <div>
-            <h2>{t.contentConfig}</h2>
-            <p>{t.contentHelp}</p>
-          </div>
-          <button className="primary" onClick={saveContent}>{t.saveContent}</button>
-        </div>
-        <textarea value={contentDraft} onChange={(event) => setContentDraft(event.target.value)} rows={18} />
-      </section>
-
-      <section className="admin-panel applications-panel">
-        <div className="admin-panel-head">
-          <h2>{t.applications}</h2>
-          <span>{applications.length} {t.records}</span>
-        </div>
-        <div className="application-table">
-          {applications.map((item) => (
-            <article key={item.id}>
-              <strong>{item.name}</strong>
-              <span>{item.company || "未填公司"}</span>
-              <span>{item.role || "未填職位"}</span>
-              <span>{item.phone}</span>
-              <span>{item.email || "未填電郵"}</span>
-              <p>{item.interest || "未填感興趣服務"}</p>
-            </article>
-          ))}
-          {!applications.length ? <p>{t.emptyApplications}</p> : null}
-        </div>
-      </section>
+        </section>
+      ) : null}
     </section>
   );
 }

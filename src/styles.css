@@ -45,7 +45,9 @@ body {
 }
 
 button,
-input {
+input,
+select,
+textarea {
   font: inherit;
 }
 
@@ -1104,6 +1106,33 @@ h3 {
   padding: 16px 20px;
 }
 
+.admin-tabs {
+  max-width: 1180px;
+  margin: 0 auto 18px;
+  padding: 8px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  background: color-mix(in srgb, var(--surface) 72%, transparent);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+}
+
+.admin-tabs button {
+  min-height: 42px;
+  padding: 0 18px;
+  border: 0;
+  border-radius: 999px;
+  background: transparent;
+  color: var(--muted);
+  font-weight: 800;
+}
+
+.admin-tabs button.is-active {
+  background: var(--accent);
+  color: #fff;
+}
+
 .admin-grid {
   display: grid;
   grid-template-columns: minmax(320px, 0.82fr) minmax(0, 1.18fr);
@@ -1135,7 +1164,9 @@ h3 {
 .admin-form input,
 .admin-form textarea,
 .admin-login input,
-.content-panel textarea {
+.content-panel textarea,
+.content-panel input,
+.content-panel select {
   width: 100%;
   border: 1px solid var(--line);
   border-radius: 12px;
@@ -1145,7 +1176,8 @@ h3 {
 }
 
 .admin-form textarea,
-.content-panel textarea {
+.content-panel textarea,
+.settings-card textarea {
   resize: vertical;
 }
 
@@ -1205,17 +1237,123 @@ h3 {
 }
 
 .content-panel textarea {
-  min-height: 430px;
-  font: 14px/1.62 ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", monospace;
-  tab-size: 2;
+  min-height: 112px;
 }
 
 .content-panel textarea:focus,
+.content-panel input:focus,
+.content-panel select:focus,
 .admin-form input:focus,
 .admin-form textarea:focus,
 .admin-login input:focus {
   outline: 3px solid color-mix(in srgb, var(--accent) 18%, transparent);
   border-color: color-mix(in srgb, var(--accent) 55%, var(--line));
+}
+
+.content-editor {
+  display: grid;
+  grid-template-columns: 260px minmax(0, 1fr);
+  gap: 22px;
+  align-items: start;
+}
+
+.page-list {
+  display: grid;
+  gap: 8px;
+  align-content: start;
+  position: sticky;
+  top: 132px;
+}
+
+.page-list label,
+.field-grid label,
+.settings-card label,
+.content-block-editor label {
+  display: grid;
+  gap: 8px;
+  color: var(--text);
+  font-weight: 800;
+}
+
+.page-list button {
+  padding: 12px 14px;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  background: var(--bg);
+  color: var(--text);
+  text-align: left;
+}
+
+.page-list button span,
+.page-list button small {
+  display: block;
+}
+
+.page-list button small {
+  margin-top: 3px;
+  color: var(--muted);
+}
+
+.page-list button.is-active {
+  border-color: color-mix(in srgb, var(--accent) 42%, var(--line));
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.content-editor-main,
+.block-list,
+.nested-list {
+  display: grid;
+  gap: 16px;
+  align-content: start;
+}
+
+.field-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 14px;
+  align-items: start;
+}
+
+.field-grid .full {
+  grid-column: 1 / -1;
+}
+
+.field-grid.single {
+  grid-template-columns: 1fr;
+}
+
+.content-block-editor,
+.settings-card,
+.nested-list article {
+  padding: 20px;
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  background: color-mix(in srgb, var(--bg) 64%, var(--surface));
+}
+
+.settings-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.settings-card.wide {
+  grid-column: 1 / -1;
+}
+
+.settings-card h3,
+.content-block-editor h3 {
+  font-size: 24px;
+}
+
+.settings-card h4 {
+  font-size: 18px;
+}
+
+.nested-list.compact article {
+  display: grid;
+  gap: 12px;
 }
 
 .admin-actions,
@@ -1277,6 +1415,48 @@ h3 {
 .application-table p {
   grid-column: 1 / -1;
   margin: 0;
+}
+
+.editable-blocks {
+  display: grid;
+  gap: 18px;
+}
+
+.editable-blocks article {
+  display: grid;
+  grid-template-columns: minmax(0, 0.48fr) minmax(0, 1fr);
+  gap: clamp(22px, 4vw, 48px);
+  align-items: center;
+  padding: clamp(26px, 4vw, 46px);
+  border: 1px solid var(--line);
+  border-radius: 18px;
+  background: var(--surface);
+}
+
+.editable-blocks article:not(:has(img)) {
+  grid-template-columns: 1fr;
+}
+
+.editable-blocks img {
+  width: 100%;
+  aspect-ratio: 4 / 3;
+  object-fit: cover;
+  border-radius: 14px;
+}
+
+.editable-blocks h2 {
+  font-size: clamp(30px, 4vw, 52px);
+}
+
+.editable-blocks p,
+.editable-blocks li {
+  color: var(--muted);
+  line-height: 1.75;
+}
+
+.editable-blocks ul {
+  margin: 18px 0 0;
+  padding-left: 20px;
 }
 
 .industry-icons {
@@ -1545,7 +1725,10 @@ h3 {
   .mission-list,
   .org-overview,
   .application-panel,
-  .admin-grid {
+  .admin-grid,
+  .content-editor,
+  .settings-grid,
+  .editable-blocks article {
     grid-template-columns: 1fr;
   }
 
@@ -1580,6 +1763,10 @@ h3 {
 
   .director-row {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .page-list {
+    position: static;
   }
 }
 
@@ -1736,6 +1923,34 @@ h3 {
 
   .admin-shell {
     padding: 28px 16px 56px;
+  }
+
+  .admin-tabs {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    border-radius: 18px;
+  }
+
+  .admin-tabs button {
+    flex: 0 0 auto;
+  }
+
+  .field-grid,
+  .settings-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .content-panel {
+    padding: 20px;
+  }
+
+  .page-list button {
+    display: none;
+  }
+
+  .editable-blocks article {
+    padding: 22px;
   }
 
   .admin-list article,
