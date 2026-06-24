@@ -47,6 +47,8 @@ npm run build
 ADMIN_PASSWORD="請換成強密碼" PORT=8787 npm run serve
 ```
 
+`ADMIN_PASSWORD` 需要至少 8 位，並同時包含字母和數字。建議正式部署時同時設置 `ADMIN_TOKEN_SECRET`。
+
 訪問地址：
 
 ```text
@@ -57,10 +59,13 @@ http://localhost:8787/admin
 後台目前支持：
 
 - 管理新聞：新增、編輯、刪除新聞。
+- 圖片上傳：在新聞表單中點擊「上傳圖片」按鈕，上傳 PNG、JPG、WEBP、GIF 圖片。
+- 網站內容配置：編輯聯絡方式、五大核心服務、會員權益、資源下載等常用內容。
 - 入會預登記：查看前台 `/application` 表單提交記錄。
-- 前台新聞頁：優先讀取後台新聞資料，後台不可用時回退到本地默認資料。
+- 中英文後台：登入頁和後台管理頁可切換中文 / English。
+- 前台內容讀取：優先讀取後台新聞與內容配置，後台不可用時回退到本地默認資料。
 
-運行資料存放於 `data/store.json`，該文件不提交到 Git。部署時請定期備份此文件；如後續資料量增加，可再升級為 MySQL、PostgreSQL 或其他數據庫。
+運行資料存放於 `data/store.json`，上傳圖片存放於 `data/uploads/`，這些文件不提交到 Git。部署時請定期備份 `data/` 目錄；如後續資料量增加，可再升級為 MySQL、PostgreSQL 或其他數據庫。
 
 ## 頁面結構
 

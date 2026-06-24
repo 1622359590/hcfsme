@@ -9,11 +9,22 @@ const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const PORT = Number(process.env.PORT || 8787);
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD;
 const TOKEN_SECRET = process.env.ADMIN_TOKEN_SECRET || ADMIN_PASSWORD;
-const DATA_FILE = process.env.DATA_FILE || path.join(__dirname, "data", "store.json");
-const DIST_DIR = path.join(__dirname, "dist");
+const DATA_FILE = path.resolve(process.env.DATA_FILE || path.join(__dirname, "data", "store.json"));
+const DATA_DIR = path.dirname(DATA_FILE);
+const UPLOAD_DIR = path.resolve(process.env.UPLOAD_DIR || path.join(DATA_DIR, "uploads"));
+const DIST_DIR = path.resolve(path.join(__dirname, "dist"));
 
 if (!ADMIN_PASSWORD) {
   console.error("Missing ADMIN_PASSWORD. Start with: ADMIN_PASSWORD='your-password' npm run serve");
+  process.exit(1);
+}
+
+function passwordIsStrong(value) {
+  return typeof value === "string" && value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value);
+}
+
+if (!passwordIsStrong(ADMIN_PASSWORD)) {
+  console.error("ADMIN_PASSWORD must be at least 8 characters and include both letters and numbers.");
   process.exit(1);
 }
 
@@ -62,6 +73,70 @@ const seedNews = [
   },
 ];
 
+const seedContent = {
+  contact: {
+    phone: "+852 2331 7979",
+    email: "info@hcfsme.org",
+    addressZh: "九龍長沙灣青山道485號九龍廣場20樓9號室",
+    addressEn: "Room 9, 20/F., Kowloon Plaza, 485 Castle Peak Road, Cheung Sha Wan, Kowloon",
+  },
+  coreServices: [
+    {
+      title: "政府資助與科創扶持",
+      value: "降低企業轉型成本，提升申請成功率。",
+      items: [
+        ["TVP 科技券計劃輔導", "協助企業評估 ERP 升級、網絡安全方案及雲端系統建設等申請可行性，支援申請文件整理。"],
+        ["創新及科技基金", "對接企業支援計劃、配對補助及大學科研團隊合作機會。"],
+        ["專利申請資助", "協助專利檢索、技術交底書撰寫及官方流程跟進。"],
+      ],
+    },
+    {
+      title: "行業委員會與精英社群",
+      value: "垂直深耕，打破資訊壁壘，共享圈層資源。",
+      items: [
+        ["三十餘行業委員會", "涵蓋大健康、金融科技、人工智慧、新零售、專業服務等領域。"],
+        ["行業月度沙龍", "定期舉辦會員聚會、標杆企業走訪與跨界交流。"],
+      ],
+    },
+    {
+      title: "大灣區商務落地與拓展",
+      value: "發揮超級聯繫人角色，助力企業北上南下無縫銜接。",
+      items: [
+        ["內地商事登記諮詢", "提供大灣區城市公司註冊、外資備案及地址託管諮詢。"],
+        ["政府招商精準對接", "組織企業與大灣區各級政府招商部門一對一洽談。"],
+      ],
+    },
+    {
+      title: "企業進階培訓與智庫",
+      value: "賦能管理層，應對新時代商業挑戰。",
+      items: [
+        ["創科與數碼化轉型", "涵蓋 AI 應用、Web3.0、企業數據安全合規等課程。"],
+        ["ESG 可持續發展", "協助企業建立 ESG 報告框架。"],
+      ],
+    },
+    {
+      title: "廠商資源對接與貿易合規",
+      value: "對標成熟工商會服務標準，提供一站式貿易支援。",
+      items: [
+        ["原產地證協助對接", "協助企業了解一般原產地證及優惠產地證申請流程。"],
+        ["產品檢測認證轉介", "對接 STC、SGS、TÜV 等權威機構辦理產品認證。"],
+      ],
+    },
+  ],
+  memberBenefits: [
+    ["企業會員", "香港或境外依法註冊之工商企業、行業商會或公會，可指定代表行使會員權利。"],
+    ["個人會員", "企業東主、合夥人、高管或具中小企管理經驗之專業人士，可直接申請入會。"],
+    ["會員權益", "優先參加培訓、研討、考察、政策解讀、會員福利活動及行業委員會交流。"],
+    ["會務參與", "入會滿三個月後享有選舉及被選舉權，可對會務提出建議及監督。"],
+  ],
+  downloads: [
+    ["商會章程", "查看章程摘要，後續可接入 PDF 下載。", "/charter"],
+    ["入會申請表", "企業及個人會員申請資料準備指引。", "/application"],
+    ["資助計劃簡介", "TVP、BUD、ITF、市場推廣基金等服務資料。", "/services"],
+    ["活動相冊", "商會活動影像記錄與年度回顧。", "/photo"],
+  ],
+};
+
 function tokenFor(password) {
   return createHash("sha256").update(`${TOKEN_SECRET}:${password}`).digest("hex");
 }
@@ -76,9 +151,14 @@ function isValidToken(token = "") {
 async function readStore() {
   try {
     const raw = await readFile(DATA_FILE, "utf8");
-    return JSON.parse(raw);
+    const store = JSON.parse(raw);
+    return {
+      news: store.news || seedNews,
+      applications: store.applications || [],
+      content: { ...seedContent, ...(store.content || {}) },
+    };
   } catch {
-    const store = { news: seedNews, applications: [] };
+    const store = { news: seedNews, applications: [], content: seedContent };
     await writeStore(store);
     return store;
   }
@@ -93,7 +173,7 @@ async function readJson(req) {
   let body = "";
   for await (const chunk of req) body += chunk;
   if (!body) return {};
-  if (body.length > 1_000_000) throw new Error("Payload too large");
+  if (body.length > 8_000_000) throw new Error("Payload too large");
   return JSON.parse(body);
 }
 
@@ -129,6 +209,11 @@ function cleanNews(input) {
   };
 }
 
+function isInsideDir(baseDir, targetPath) {
+  const relative = path.relative(baseDir, targetPath);
+  return relative && !relative.startsWith("..") && !path.isAbsolute(relative);
+}
+
 async function handleApi(req, res, url) {
   if (req.method === "GET" && url.pathname === "/api/health") {
     sendJson(res, 200, { ok: true });
@@ -138,6 +223,12 @@ async function handleApi(req, res, url) {
   if (req.method === "GET" && url.pathname === "/api/news") {
     const store = await readStore();
     sendJson(res, 200, { news: store.news || [] });
+    return;
+  }
+
+  if (req.method === "GET" && url.pathname === "/api/content") {
+    const store = await readStore();
+    sendJson(res, 200, { content: store.content || seedContent });
     return;
   }
 
@@ -166,6 +257,10 @@ async function handleApi(req, res, url) {
 
   if (req.method === "POST" && url.pathname === "/api/admin/login") {
     const input = await readJson(req);
+    if (!passwordIsStrong(String(input.password || ""))) {
+      sendJson(res, 400, { error: "密碼至少 8 位，並需包含字母和數字" });
+      return;
+    }
     if (String(input.password || "") !== ADMIN_PASSWORD) {
       sendJson(res, 401, { error: "密碼錯誤" });
       return;
@@ -231,6 +326,49 @@ async function handleApi(req, res, url) {
     return;
   }
 
+  if (url.pathname === "/api/admin/content") {
+    if (!requireAdmin(req, res)) return;
+    const store = await readStore();
+
+    if (req.method === "GET") {
+      sendJson(res, 200, { content: store.content || seedContent });
+      return;
+    }
+
+    if (req.method === "PUT") {
+      const input = await readJson(req);
+      if (!input.content || typeof input.content !== "object" || Array.isArray(input.content)) {
+        sendJson(res, 400, { error: "內容配置格式不正確" });
+        return;
+      }
+      store.content = { ...seedContent, ...input.content };
+      await writeStore(store);
+      sendJson(res, 200, { content: store.content });
+      return;
+    }
+  }
+
+  if (req.method === "POST" && url.pathname === "/api/admin/upload") {
+    if (!requireAdmin(req, res)) return;
+    const input = await readJson(req);
+    const match = String(input.dataUrl || "").match(/^data:(image\/(?:png|jpeg|webp|gif));base64,([A-Za-z0-9+/=]+)$/);
+    if (!match) {
+      sendJson(res, 400, { error: "只支持 PNG、JPG、WEBP、GIF 圖片" });
+      return;
+    }
+    const extMap = { "image/png": ".png", "image/jpeg": ".jpg", "image/webp": ".webp", "image/gif": ".gif" };
+    const buffer = Buffer.from(match[2], "base64");
+    if (buffer.length > 5_000_000) {
+      sendJson(res, 400, { error: "圖片不能超過 5MB" });
+      return;
+    }
+    await mkdir(UPLOAD_DIR, { recursive: true });
+    const safeName = `${Date.now()}-${randomUUID()}${extMap[match[1]]}`;
+    await writeFile(path.join(UPLOAD_DIR, safeName), buffer);
+    sendJson(res, 201, { url: `/uploads/${safeName}` });
+    return;
+  }
+
   sendJson(res, 404, { error: "Not found" });
 }
 
@@ -248,9 +386,31 @@ const mime = {
 };
 
 async function serveStatic(req, res, url) {
+  if (url.pathname.startsWith("/uploads/")) {
+    const uploadPath = path.resolve(path.join(UPLOAD_DIR, decodeURIComponent(url.pathname.replace("/uploads/", ""))));
+    if (!isInsideDir(UPLOAD_DIR, uploadPath)) {
+      res.writeHead(403);
+      res.end("Forbidden");
+      return;
+    }
+    try {
+      await stat(uploadPath);
+      res.writeHead(200, {
+        "Content-Type": mime[path.extname(uploadPath)] || "application/octet-stream",
+        "Cache-Control": "public, max-age=31536000",
+      });
+      createReadStream(uploadPath).pipe(res);
+      return;
+    } catch {
+      res.writeHead(404);
+      res.end("Not found");
+      return;
+    }
+  }
+
   const requested = decodeURIComponent(url.pathname === "/" ? "/index.html" : url.pathname);
-  const filePath = path.normalize(path.join(DIST_DIR, requested));
-  if (!filePath.startsWith(DIST_DIR)) {
+  const filePath = path.resolve(path.join(DIST_DIR, requested));
+  if (!isInsideDir(DIST_DIR, filePath)) {
     res.writeHead(403);
     res.end("Forbidden");
     return;

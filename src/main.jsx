@@ -292,6 +292,13 @@ const downloads = [
   ["活動相冊", "商會活動影像記錄與年度回顧。", "/photo"],
 ];
 
+const defaultEditableContent = {
+  contact,
+  coreServices,
+  memberBenefits,
+  downloads,
+};
+
 const directors = [
   ["譚耀泉 Sam Tam", "指導主席"],
   ["蔣文凱 Elisa", "會董會主席"],
@@ -448,9 +455,17 @@ function useRoute() {
 function App() {
   const [path, navigate] = useRoute();
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [content, setContent] = useState(defaultEditableContent);
   const appRef = useRef(null);
   const title = pages[path]?.title || pages["/"].title;
   const isAdmin = path === "/admin";
+  const siteContact = content.contact || contact;
+
+  useEffect(() => {
+    apiRequest("/api/content")
+      .then((data) => setContent({ ...defaultEditableContent, ...(data.content || {}) }))
+      .catch(() => setContent(defaultEditableContent));
+  }, []);
 
   useEffect(() => {
     document.title = `${title} | 香港中小企業工商聯合會`;
@@ -558,21 +573,21 @@ function App() {
 
   return (
     <div ref={appRef}>
-      {!isAdmin ? <Header path={path} navigate={navigate} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} /> : null}
+      {!isAdmin ? <Header path={path} navigate={navigate} mobileOpen={mobileOpen} setMobileOpen={setMobileOpen} siteContact={siteContact} /> : null}
       <main>
-        <RenderPage path={path} navigate={navigate} />
+        <RenderPage path={path} navigate={navigate} content={content} siteContact={siteContact} />
       </main>
-      {!isAdmin ? <Footer navigate={navigate} /> : null}
+      {!isAdmin ? <Footer navigate={navigate} siteContact={siteContact} /> : null}
     </div>
   );
 }
 
-function Header({ path, navigate, mobileOpen, setMobileOpen }) {
+function Header({ path, navigate, mobileOpen, setMobileOpen, siteContact }) {
   return (
     <header className="site-header">
       <div className="topbar">
-        <span><EnvelopeSimple size={16} /> {contact.email}</span>
-        <span><Phone size={16} /> {contact.phone}</span>
+        <span><EnvelopeSimple size={16} /> {siteContact.email}</span>
+        <span><Phone size={16} /> {siteContact.phone}</span>
       </div>
       <nav className="nav-wrap" aria-label="主導航">
         <button className="brand" onClick={() => navigate("/")} aria-label="返回首頁">
@@ -618,27 +633,27 @@ function Header({ path, navigate, mobileOpen, setMobileOpen }) {
   );
 }
 
-function RenderPage({ path, navigate }) {
+function RenderPage({ path, navigate, content, siteContact }) {
   if (path === "/") return <Home navigate={navigate} />;
   if (path === "/about") return <AboutPage navigate={navigate} />;
   if (path === "/intro") return <IntroPage />;
   if (path === "/charter") return <CharterPage />;
   if (path === "/structure") return <StructurePage />;
   if (path === "/directors") return <DirectorsPage />;
-  if (path === "/services") return <ServicesPage />;
+  if (path === "/services") return <ServicesPage content={content} />;
   if (path === "/industry") return <IndustryPage />;
   if (path === "/activities") return <ActivitiesPage navigate={navigate} />;
   if (path === "/news") return <NewsPage />;
   if (path === "/photo") return <PhotoPage />;
   if (path === "/member-services") return <MemberServices navigate={navigate} />;
-  if (path === "/member-benefits") return <MemberBenefitsPage />;
+  if (path === "/member-benefits") return <MemberBenefitsPage content={content} />;
   if (path === "/membership") return <MembershipPage />;
   if (path === "/application") return <ApplicationPage />;
   if (["/agreement", "/certification", "/protection"].includes(path)) return <LegalPage data={pages[path]} />;
   if (path === "/resources") return <ResourcesPage navigate={navigate} />;
   if (path === "/announcements") return <AnnouncementsPage />;
-  if (path === "/downloads") return <DownloadsPage navigate={navigate} />;
-  if (path === "/contact") return <ContactPage />;
+  if (path === "/downloads") return <DownloadsPage navigate={navigate} content={content} />;
+  if (path === "/contact") return <ContactPage siteContact={siteContact} />;
   if (path === "/subscribe") return <SubscribePage />;
   if (path === "/admin") return <AdminPage navigate={navigate} />;
   return <Home navigate={navigate} />;
@@ -929,7 +944,8 @@ function DirectorsPage() {
   );
 }
 
-function ServicesPage() {
+function ServicesPage({ content }) {
+  const serviceGroups = content.coreServices || coreServices;
   return (
     <>
       <PageHero {...pages["/services"]} imageUrl={image.funding} />
@@ -946,7 +962,7 @@ function ServicesPage() {
         </div>
       </section>
       <section className="section service-system">
-        {coreServices.map((group, index) => (
+        {serviceGroups.map((group, index) => (
           <article key={group.title} id={`service-${index + 1}`} className="service-panel">
             <div className="service-panel-head">
               <span>{String(index + 1).padStart(2, "0")}</span>
@@ -1150,12 +1166,13 @@ function MemberServices({ navigate }) {
   );
 }
 
-function MemberBenefitsPage() {
+function MemberBenefitsPage({ content }) {
+  const benefits = content.memberBenefits || memberBenefits;
   return (
     <>
       <PageHero {...pages["/member-benefits"]} imageUrl={image.meeting} />
       <section className="section benefit-grid">
-        {memberBenefits.map(([title, desc]) => (
+        {benefits.map(([title, desc]) => (
           <article key={title}>
             <UsersThree size={34} />
             <h2>{title}</h2>
@@ -1309,12 +1326,13 @@ function AnnouncementsPage() {
   );
 }
 
-function DownloadsPage({ navigate }) {
+function DownloadsPage({ navigate, content }) {
+  const downloadItems = content.downloads || downloads;
   return (
     <>
       <PageHero {...pages["/downloads"]} imageUrl={image.funding} />
       <section className="section download-list">
-        {downloads.map(([title, desc, path]) => (
+        {downloadItems.map(([title, desc, path]) => (
           <button key={title} onClick={() => navigate(path)}>
             <DownloadSimple size={30} />
             <span>{title}</span>
@@ -1338,7 +1356,7 @@ function ContactPrompt() {
   );
 }
 
-function ContactPage() {
+function ContactPage({ siteContact }) {
   return (
     <>
       <PageHero {...pages["/contact"]} imageUrl={image.side} />
@@ -1346,8 +1364,8 @@ function ContactPage() {
         <article>
           <Buildings size={34} />
           <h2>香港辦事處</h2>
-          <p>{contact.addressZh}</p>
-          <p>{contact.addressEn}</p>
+          <p>{siteContact.addressZh}</p>
+          <p>{siteContact.addressEn}</p>
         </article>
         <article>
           <GlobeHemisphereEast size={34} />
@@ -1357,8 +1375,8 @@ function ContactPage() {
         <article>
           <EnvelopeSimple size={34} />
           <h2>聯絡方式</h2>
-          <p>{contact.email}</p>
-          <p>{contact.phone}</p>
+          <p>{siteContact.email}</p>
+          <p>{siteContact.phone}</p>
         </article>
       </section>
     </>
@@ -1388,25 +1406,116 @@ function SubscribePage() {
 
 function AdminPage({ navigate }) {
   const emptyNews = { title: "", desc: "", date: "", image: "" };
+  const copy = {
+    zh: {
+      back: "返回網站",
+      logout: "登出",
+      loginTitle: "港中聯網站後台",
+      loginHelp: "請輸入部署時設定的後台密碼。密碼至少 8 位，並需包含字母和數字。",
+      password: "後台密碼",
+      login: "登入後台",
+      adminTitle: "網站後台",
+      adminDesc: "管理新聞、網站內容與線上入會預登記資料。",
+      newNews: "新增新聞",
+      editNews: "編輯新聞",
+      title: "標題",
+      date: "日期",
+      imageUrl: "圖片",
+      uploadImage: "上傳圖片",
+      summary: "摘要",
+      save: "保存修改",
+      create: "新增新聞",
+      cancel: "取消編輯",
+      newsList: "新聞列表",
+      refresh: "刷新",
+      refreshing: "刷新中",
+      edit: "編輯",
+      delete: "刪除",
+      contentConfig: "網站內容配置",
+      contentHelp: "可修改聯絡方式、商會服務、會員權益、下載入口等內容。格式需保持合法 JSON。",
+      saveContent: "保存內容配置",
+      applications: "入會預登記",
+      records: "筆",
+      emptyApplications: "暫無預登記資料。",
+      passwordWeak: "密碼至少 8 位，並需包含字母和數字。",
+      loginOk: "登入成功",
+      newsCreated: "新聞已新增",
+      newsUpdated: "新聞已更新",
+      newsDeleted: "新聞已刪除",
+      contentSaved: "網站內容已保存",
+      uploadOk: "圖片已上傳並填入圖片欄位",
+    },
+    en: {
+      back: "Back to site",
+      logout: "Log out",
+      loginTitle: "HCFSME Admin",
+      loginHelp: "Enter the admin password set on the server. It must be at least 8 characters and include letters and numbers.",
+      password: "Admin password",
+      login: "Log in",
+      adminTitle: "Admin",
+      adminDesc: "Manage news, editable site content, and membership pre-registration records.",
+      newNews: "New news",
+      editNews: "Edit news",
+      title: "Title",
+      date: "Date",
+      imageUrl: "Image",
+      uploadImage: "Upload image",
+      summary: "Summary",
+      save: "Save changes",
+      create: "Create news",
+      cancel: "Cancel edit",
+      newsList: "News list",
+      refresh: "Refresh",
+      refreshing: "Refreshing",
+      edit: "Edit",
+      delete: "Delete",
+      contentConfig: "Site content config",
+      contentHelp: "Edit contact info, services, member benefits, downloads, and other editable content. Keep valid JSON.",
+      saveContent: "Save content config",
+      applications: "Applications",
+      records: "records",
+      emptyApplications: "No applications yet.",
+      passwordWeak: "Password must be at least 8 characters and include letters and numbers.",
+      loginOk: "Logged in",
+      newsCreated: "News created",
+      newsUpdated: "News updated",
+      newsDeleted: "News deleted",
+      contentSaved: "Site content saved",
+      uploadOk: "Image uploaded and inserted",
+    },
+  };
   const [password, setPassword] = useState("");
   const [token, setToken] = useState(() => localStorage.getItem("hcfsme_admin_token") || "");
+  const [lang, setLang] = useState(() => localStorage.getItem("hcfsme_admin_lang") || "zh");
   const [items, setItems] = useState([]);
   const [applications, setApplications] = useState([]);
+  const [contentDraft, setContentDraft] = useState(JSON.stringify(defaultEditableContent, null, 2));
   const [draft, setDraft] = useState(emptyNews);
   const [editingId, setEditingId] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const t = copy[lang] || copy.zh;
+
+  const switchLang = () => {
+    const next = lang === "zh" ? "en" : "zh";
+    localStorage.setItem("hcfsme_admin_lang", next);
+    setLang(next);
+  };
+
+  const validPassword = (value) => value.length >= 8 && /[A-Za-z]/.test(value) && /\d/.test(value);
 
   const loadAdminData = async (authToken = token) => {
     if (!authToken) return;
     setLoading(true);
     try {
-      const [newsData, appData] = await Promise.all([
+      const [newsData, appData, contentData] = await Promise.all([
         apiRequest("/api/admin/news", { token: authToken }),
         apiRequest("/api/admin/applications", { token: authToken }),
+        apiRequest("/api/admin/content", { token: authToken }),
       ]);
       setItems(newsData.news || []);
       setApplications(appData.applications || []);
+      setContentDraft(JSON.stringify({ ...defaultEditableContent, ...(contentData.content || {}) }, null, 2));
     } catch (error) {
       setMessage(error.message || "讀取後台資料失敗");
       if (/Unauthorized|401/.test(error.message)) {
@@ -1425,6 +1534,10 @@ function AdminPage({ navigate }) {
   const login = async (event) => {
     event.preventDefault();
     setMessage("");
+    if (!validPassword(password)) {
+      setMessage(t.passwordWeak);
+      return;
+    }
     try {
       const data = await apiRequest("/api/admin/login", {
         method: "POST",
@@ -1433,7 +1546,7 @@ function AdminPage({ navigate }) {
       localStorage.setItem("hcfsme_admin_token", data.token);
       setToken(data.token);
       setPassword("");
-      setMessage("登入成功");
+      setMessage(t.loginOk);
     } catch (error) {
       setMessage(error.message || "登入失敗");
     }
@@ -1449,14 +1562,14 @@ function AdminPage({ navigate }) {
           token,
           body: JSON.stringify(draft),
         });
-        setMessage("新聞已更新");
+        setMessage(t.newsUpdated);
       } else {
         await apiRequest("/api/admin/news", {
           method: "POST",
           token,
           body: JSON.stringify(draft),
         });
-        setMessage("新聞已新增");
+        setMessage(t.newsCreated);
       }
       setDraft(emptyNews);
       setEditingId("");
@@ -1475,10 +1588,51 @@ function AdminPage({ navigate }) {
     setMessage("");
     try {
       await apiRequest(`/api/admin/news/${id}`, { method: "DELETE", token });
-      setMessage("新聞已刪除");
+      setMessage(t.newsDeleted);
       await loadAdminData();
     } catch (error) {
       setMessage(error.message || "刪除失敗");
+    }
+  };
+
+  const saveContent = async () => {
+    setMessage("");
+    try {
+      const parsed = JSON.parse(contentDraft);
+      await apiRequest("/api/admin/content", {
+        method: "PUT",
+        token,
+        body: JSON.stringify({ content: parsed }),
+      });
+      setMessage(t.contentSaved);
+      await loadAdminData();
+    } catch (error) {
+      setMessage(error.message || "內容保存失敗，請檢查 JSON 格式");
+    }
+  };
+
+  const uploadImage = async (event) => {
+    const file = event.target.files?.[0];
+    if (!file) return;
+    setMessage("");
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const data = await apiRequest("/api/admin/upload", {
+        method: "POST",
+        token,
+        body: JSON.stringify({ filename: file.name, dataUrl }),
+      });
+      setDraft((current) => ({ ...current, image: data.url }));
+      setMessage(t.uploadOk);
+    } catch (error) {
+      setMessage(error.message || "圖片上傳失敗");
+    } finally {
+      event.target.value = "";
     }
   };
 
@@ -1493,12 +1647,15 @@ function AdminPage({ navigate }) {
     return (
       <section className="admin-shell">
         <div className="admin-login">
-          <button className="text-button" onClick={() => navigate("/")}>返回網站</button>
-          <h1>港中聯網站後台</h1>
-          <p>請輸入部署時設定的後台密碼。</p>
+          <div className="admin-lang-row">
+            <button className="text-button" onClick={() => navigate("/")}>{t.back}</button>
+            <button className="text-button" onClick={switchLang}>{lang === "zh" ? "EN" : "中文"}</button>
+          </div>
+          <h1>{t.loginTitle}</h1>
+          <p>{t.loginHelp}</p>
           <form onSubmit={login}>
-            <label>後台密碼<input type="password" value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
-            <button className="primary" type="submit">登入後台</button>
+            <label>{t.password}<input type="password" minLength={8} value={password} onChange={(event) => setPassword(event.target.value)} required /></label>
+            <button className="primary" type="submit">{t.login}</button>
           </form>
           {message ? <p className="form-status">{message}</p> : null}
         </div>
@@ -1511,12 +1668,13 @@ function AdminPage({ navigate }) {
       <div className="admin-top">
         <div>
           <p className="kicker">HCFSME Admin</p>
-          <h1>網站後台</h1>
-          <p>管理新聞內容，查看線上入會預登記資料。</p>
+          <h1>{t.adminTitle}</h1>
+          <p>{t.adminDesc}</p>
         </div>
         <div>
-          <button className="secondary" onClick={() => navigate("/")}>返回網站</button>
-          <button className="secondary" onClick={logout}>登出</button>
+          <button className="secondary" onClick={switchLang}>{lang === "zh" ? "English" : "中文"}</button>
+          <button className="secondary" onClick={() => navigate("/")}>{t.back}</button>
+          <button className="secondary" onClick={logout}>{t.logout}</button>
         </div>
       </div>
 
@@ -1524,21 +1682,25 @@ function AdminPage({ navigate }) {
 
       <section className="admin-grid">
         <form className="admin-panel admin-form" onSubmit={saveNews}>
-          <h2>{editingId ? "編輯新聞" : "新增新聞"}</h2>
-          <label>標題<input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} required /></label>
-          <label>日期<input value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} placeholder="2026 年 6 月 24 日" /></label>
-          <label>圖片 URL<input value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="https://..." /></label>
-          <label>摘要<textarea value={draft.desc} onChange={(event) => setDraft({ ...draft, desc: event.target.value })} rows={5} /></label>
+          <h2>{editingId ? t.editNews : t.newNews}</h2>
+          <label>{t.title}<input value={draft.title} onChange={(event) => setDraft({ ...draft, title: event.target.value })} required /></label>
+          <label>{t.date}<input value={draft.date} onChange={(event) => setDraft({ ...draft, date: event.target.value })} placeholder="2026 年 6 月 24 日" /></label>
+          <label>{t.imageUrl}<input value={draft.image} onChange={(event) => setDraft({ ...draft, image: event.target.value })} placeholder="https://..." /></label>
+          <label className="upload-button">
+            {t.uploadImage}
+            <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={uploadImage} />
+          </label>
+          <label>{t.summary}<textarea value={draft.desc} onChange={(event) => setDraft({ ...draft, desc: event.target.value })} rows={5} /></label>
           <div className="admin-actions">
-            <button className="primary" type="submit">{editingId ? "保存修改" : "新增新聞"}</button>
-            {editingId ? <button className="secondary" type="button" onClick={() => { setEditingId(""); setDraft(emptyNews); }}>取消編輯</button> : null}
+            <button className="primary" type="submit">{editingId ? t.save : t.create}</button>
+            {editingId ? <button className="secondary" type="button" onClick={() => { setEditingId(""); setDraft(emptyNews); }}>{t.cancel}</button> : null}
           </div>
         </form>
 
         <div className="admin-panel">
           <div className="admin-panel-head">
-            <h2>新聞列表</h2>
-            <button className="text-button" onClick={() => loadAdminData()}>{loading ? "刷新中" : "刷新"}</button>
+            <h2>{t.newsList}</h2>
+            <button className="text-button" onClick={() => loadAdminData()}>{loading ? t.refreshing : t.refresh}</button>
           </div>
           <div className="admin-list">
             {items.map((item) => (
@@ -1548,8 +1710,8 @@ function AdminPage({ navigate }) {
                   <p>{item.date}</p>
                 </div>
                 <div>
-                  <button className="text-button" onClick={() => editNews(item)}>編輯</button>
-                  <button className="text-button danger" onClick={() => deleteNews(item.id)}>刪除</button>
+                  <button className="text-button" onClick={() => editNews(item)}>{t.edit}</button>
+                  <button className="text-button danger" onClick={() => deleteNews(item.id)}>{t.delete}</button>
                 </div>
               </article>
             ))}
@@ -1557,10 +1719,21 @@ function AdminPage({ navigate }) {
         </div>
       </section>
 
+      <section className="admin-panel content-panel">
+        <div className="admin-panel-head">
+          <div>
+            <h2>{t.contentConfig}</h2>
+            <p>{t.contentHelp}</p>
+          </div>
+          <button className="primary" onClick={saveContent}>{t.saveContent}</button>
+        </div>
+        <textarea value={contentDraft} onChange={(event) => setContentDraft(event.target.value)} rows={18} />
+      </section>
+
       <section className="admin-panel applications-panel">
         <div className="admin-panel-head">
-          <h2>入會預登記</h2>
-          <span>{applications.length} 筆</span>
+          <h2>{t.applications}</h2>
+          <span>{applications.length} {t.records}</span>
         </div>
         <div className="application-table">
           {applications.map((item) => (
@@ -1573,14 +1746,14 @@ function AdminPage({ navigate }) {
               <p>{item.interest || "未填感興趣服務"}</p>
             </article>
           ))}
-          {!applications.length ? <p>暫無預登記資料。</p> : null}
+          {!applications.length ? <p>{t.emptyApplications}</p> : null}
         </div>
       </section>
     </section>
   );
 }
 
-function Footer({ navigate }) {
+function Footer({ navigate, siteContact }) {
   const quickLinks = useMemo(() => nav.flatMap((item) => item.children || item).slice(0, 9), []);
   return (
     <footer className="footer">
@@ -1598,9 +1771,9 @@ function Footer({ navigate }) {
         </div>
         <div>
           <h3>Contact Us</h3>
-          <p><Phone size={16} /> {contact.phone}</p>
-          <p><EnvelopeSimple size={16} /> {contact.email}</p>
-          <p><MapPin size={16} /> {contact.addressZh}</p>
+          <p><Phone size={16} /> {siteContact.phone}</p>
+          <p><EnvelopeSimple size={16} /> {siteContact.email}</p>
+          <p><MapPin size={16} /> {siteContact.addressZh}</p>
         </div>
       </div>
       <div className="copyright">© 1998-2026 港中聯 版權所有</div>
