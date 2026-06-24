@@ -10,6 +10,8 @@
   --accent-2: #c99b43;
   --accent-soft: #dfeee8;
   --shadow: 0 24px 80px rgba(17, 45, 35, 0.13);
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in-out: cubic-bezier(0.45, 0, 0.55, 1);
   font-family: "Avenir Next", "Helvetica Neue", Arial, "PingFang TC", "Microsoft JhengHei", sans-serif;
 }
 
@@ -68,6 +70,7 @@ img {
   background: color-mix(in srgb, var(--bg) 92%, transparent);
   backdrop-filter: blur(18px);
   border-bottom: 1px solid var(--line);
+  transform: translateZ(0);
 }
 
 .topbar {
@@ -148,10 +151,18 @@ img {
   white-space: nowrap;
 }
 
+.nav-item > button svg {
+  transition: transform 180ms var(--ease-out);
+}
+
 .nav-item > button:hover,
 .nav-item > button.active {
   background: var(--accent-soft);
   color: var(--accent);
+}
+
+.nav-item:hover > button svg {
+  transform: rotate(180deg);
 }
 
 .dropdown {
@@ -167,7 +178,8 @@ img {
   opacity: 0;
   transform: translateY(6px);
   pointer-events: none;
-  transition: opacity 180ms ease, transform 180ms ease;
+  transform-origin: top left;
+  transition: opacity 180ms var(--ease-out), transform 180ms var(--ease-out);
 }
 
 .dropdown::before {
@@ -191,10 +203,13 @@ img {
   text-align: left;
   border-radius: 8px;
   white-space: nowrap;
+  transition: background 160ms var(--ease-out), color 160ms var(--ease-out), transform 160ms var(--ease-out);
 }
 
 .dropdown button:hover {
   background: var(--surface-2);
+  color: var(--accent);
+  transform: translateX(2px);
 }
 
 .menu-toggle {
@@ -278,7 +293,11 @@ img {
   align-items: center;
   justify-content: center;
   gap: 8px;
-  transition: transform 160ms ease, background 160ms ease;
+  transition:
+    transform 180ms var(--ease-out),
+    background 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out);
   white-space: nowrap;
 }
 
@@ -294,6 +313,17 @@ img {
   color: var(--text);
 }
 
+.primary:hover {
+  background: color-mix(in srgb, var(--accent) 88%, #000);
+  border-color: color-mix(in srgb, var(--accent) 88%, #000);
+  box-shadow: 0 10px 26px rgba(15, 107, 79, 0.18);
+}
+
+.secondary:hover {
+  border-color: color-mix(in srgb, var(--accent) 38%, var(--line));
+  color: var(--accent);
+}
+
 .primary:active,
 .secondary:active,
 .service-links button:active {
@@ -306,7 +336,7 @@ img {
   overflow: hidden;
   min-height: 560px;
   box-shadow: var(--shadow);
-  will-change: transform, opacity;
+  transform: translateZ(0);
 }
 
 .hero-image img {
@@ -314,7 +344,7 @@ img {
   height: 100%;
   min-height: 560px;
   object-fit: cover;
-  will-change: transform;
+  transform: scale(1.012);
 }
 
 .intro-band {
@@ -1132,12 +1162,17 @@ h3 {
   color: var(--accent) !important;
   font-weight: 800 !important;
   cursor: pointer;
-  transition: background 180ms ease, border-color 180ms ease, transform 180ms ease;
+  transition:
+    background 180ms var(--ease-out),
+    border-color 180ms var(--ease-out),
+    transform 180ms var(--ease-out),
+    box-shadow 180ms var(--ease-out);
 }
 
 .upload-button:hover {
   background: color-mix(in srgb, var(--accent-soft) 72%, white);
   border-color: color-mix(in srgb, var(--accent) 48%, var(--line));
+  box-shadow: 0 8px 18px rgba(15, 107, 79, 0.1);
 }
 
 .upload-button:active {
@@ -1420,20 +1455,63 @@ h3 {
 
 @media (prefers-reduced-motion: no-preference) {
   .hero-image,
-  .page-hero img,
   .support-card,
   .director-row article,
+  .director-grid article,
   .news-row article,
-  .service-links button {
-    transition: transform 220ms ease, box-shadow 220ms ease;
+  .news-grid article,
+  .service-links button,
+  .fund-list article,
+  .offices article,
+  .legal article,
+  .steps article,
+  .industry-icons figure,
+  .governance-list article,
+  .committee-board article,
+  .service-panel,
+  .activity-grid article,
+  .benefit-grid article,
+  .resource-list article,
+  .download-list button,
+  .admin-panel {
+    transition:
+      transform 220ms var(--ease-out),
+      box-shadow 220ms var(--ease-out),
+      border-color 220ms var(--ease-out);
   }
 
   .support-card:hover,
   .director-row article:hover,
+  .director-grid article:hover,
   .news-row article:hover,
-  .service-links button:hover {
+  .news-grid article:hover,
+  .service-links button:hover,
+  .fund-list article:hover,
+  .offices article:hover,
+  .legal article:hover,
+  .steps article:hover,
+  .industry-icons figure:hover,
+  .governance-list article:hover,
+  .committee-board article:hover,
+  .service-panel:hover,
+  .activity-grid article:hover,
+  .benefit-grid article:hover,
+  .resource-list article:hover,
+  .download-list button:hover,
+  .admin-panel:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow);
+  }
+
+  .hero-image:hover {
+    transform: translateY(-3px);
+  }
+
+  .news-grid article:hover,
+  .service-panel:hover,
+  .download-list button:hover,
+  .admin-panel:hover {
+    border-color: color-mix(in srgb, var(--accent) 32%, var(--line));
   }
 }
 

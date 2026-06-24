@@ -487,22 +487,59 @@ function App() {
       return;
     }
 
-    gsap.defaults({ ease: "power3.out" });
+    gsap.defaults({ ease: "expo.out", overwrite: "auto" });
+    ScrollTrigger.config({ limitCallbacks: true });
 
-    const introTimeline = gsap.timeline({ defaults: { duration: 0.72 } });
+    const setLayer = (targets) => {
+      gsap.set(targets, { willChange: "transform, opacity" });
+    };
+
+    const clearLayer = (targets) => {
+      gsap.set(targets, { clearProps: "willChange" });
+    };
+
+    const introTimeline = gsap.timeline({ defaults: { duration: 0.68 } });
     introTimeline
-      .from(".site-header", { y: -18, autoAlpha: 0, duration: 0.42, clearProps: "all" })
-      .from(".hero-copy > *, .page-hero > div > *", {
-        y: 26,
+      .from(".site-header", { y: -16, autoAlpha: 0, duration: 0.38, clearProps: "all" })
+      .from(".nav-item", {
+        y: -8,
         autoAlpha: 0,
-        stagger: 0.075,
+        duration: 0.36,
+        stagger: 0.025,
+        clearProps: "all",
+      }, "-=0.14")
+      .from(".hero-copy .kicker, .page-hero .kicker, .admin-top .kicker", {
+        y: 12,
+        autoAlpha: 0,
+        duration: 0.36,
+        clearProps: "all",
+      }, "-=0.08")
+      .from(".hero-copy h1, .page-hero h1, .admin-login h1, .admin-top h1", {
+        y: 34,
+        autoAlpha: 0,
+        duration: 0.76,
         clearProps: "all",
       }, "-=0.12")
+      .from(".hero-copy > p:not(.kicker), .page-hero p, .admin-login > p, .admin-top > div:first-child > p", {
+        y: 20,
+        autoAlpha: 0,
+        duration: 0.58,
+        stagger: 0.055,
+        clearProps: "all",
+      }, "-=0.42")
+      .from(".hero-actions > *, .admin-top > div:last-child > *", {
+        y: 16,
+        scale: 0.98,
+        autoAlpha: 0,
+        duration: 0.42,
+        stagger: 0.045,
+        clearProps: "all",
+      }, "-=0.3")
       .from(".hero-image, .page-hero img", {
         y: 30,
-        scale: 0.975,
+        scale: 0.976,
         autoAlpha: 0,
-        duration: 0.86,
+        duration: 0.88,
         clearProps: "all",
       }, "-=0.42")
       .from(".intro-band > div", {
@@ -514,18 +551,20 @@ function App() {
       }, "-=0.32");
 
     ScrollTrigger.batch(".section", {
-      start: "top 84%",
+      start: "top 86%",
       once: true,
       interval: 0.08,
       batchMax: 3,
       onEnter: (batch) => {
-        gsap.fromTo(batch, { autoAlpha: 0, y: 42 }, {
+        setLayer(batch);
+        gsap.fromTo(batch, { autoAlpha: 0, y: 38 }, {
           autoAlpha: 1,
           y: 0,
-          duration: 0.78,
+          duration: 0.72,
           stagger: 0.08,
           overwrite: true,
           clearProps: "all",
+          onComplete: () => clearLayer(batch),
         });
       },
     });
@@ -533,33 +572,74 @@ function App() {
     ScrollTrigger.batch(
       ".support-card, .director-row article, .director-grid article, .news-row article, .news-grid article, .service-links button, .fund-list article, .offices article, .legal article, .steps article, .industry-icons figure, .governance-list article, .committee-board article, .service-panel, .activity-grid article, .benefit-grid article, .resource-list article, .download-list button",
       {
-        start: "top 88%",
+        start: "top 90%",
         once: true,
         interval: 0.06,
         batchMax: 6,
         onEnter: (batch) => {
-          gsap.fromTo(batch, { autoAlpha: 0, y: 28, scale: 0.985 }, {
+          setLayer(batch);
+          gsap.fromTo(batch, { autoAlpha: 0, y: 24, scale: 0.986 }, {
             autoAlpha: 1,
             y: 0,
             scale: 1,
-            duration: 0.62,
-            stagger: { each: 0.045, from: "start" },
+            duration: 0.58,
+            stagger: { each: 0.04, from: "start" },
             overwrite: true,
             clearProps: "all",
+            onComplete: () => clearLayer(batch),
           });
         },
       },
     );
 
+    gsap.utils.toArray(".service-panel").forEach((panel) => {
+      const lines = panel.querySelectorAll("section");
+      if (!lines.length) return;
+      ScrollTrigger.create({
+        trigger: panel,
+        start: "top 72%",
+        once: true,
+        onEnter: () => {
+          setLayer(lines);
+          gsap.fromTo(lines, { autoAlpha: 0, x: 18 }, {
+            autoAlpha: 1,
+            x: 0,
+            duration: 0.42,
+            stagger: 0.045,
+            clearProps: "all",
+            onComplete: () => clearLayer(lines),
+          });
+        },
+      });
+    });
+
+    ScrollTrigger.batch(".admin-panel, .admin-message", {
+      start: "top 94%",
+      once: true,
+      interval: 0.04,
+      batchMax: 4,
+      onEnter: (batch) => {
+        setLayer(batch);
+        gsap.fromTo(batch, { autoAlpha: 0, y: 20 }, {
+          autoAlpha: 1,
+          y: 0,
+          duration: 0.46,
+          stagger: 0.035,
+          clearProps: "all",
+          onComplete: () => clearLayer(batch),
+        });
+      },
+    });
+
     gsap.utils.toArray(".hero-image img, .page-hero img, .gallery img").forEach((target) => {
       gsap.to(target, {
-        yPercent: -5,
+        yPercent: -4,
         ease: "none",
         scrollTrigger: {
           trigger: target,
           start: "top bottom",
           end: "bottom top",
-          scrub: 1,
+          scrub: 0.8,
         },
       });
     });

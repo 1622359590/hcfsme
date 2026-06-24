@@ -102,11 +102,11 @@ http://localhost:8787/admin
 
 站點使用 GSAP 製作一組克制的機構站動效：
 
-- 首屏標題、文案、圖片依序進場。
-- 區塊在滾動進入視窗時淡入上移。
-- 卡片、新聞、會董、行業圖示使用批量 stagger reveal。
-- 頁面圖片有輕微 scroll-linked 視差。
-- 所有動畫尊重 `prefers-reduced-motion: reduce`，並只動畫 `transform` 與 `opacity` 以降低性能風險。
+- 首屏按導航、標籤、標題、說明、按鈕與圖片分段進場，節奏參考視頻分鏡的時間層次。
+- 區塊、服務詳情、卡片、新聞、會董、行業圖示使用 ScrollTrigger 批量 stagger reveal。
+- 頁面圖片使用低幅度 scroll-linked 視差，避免影響閱讀。
+- 按鈕、導航、下拉菜單、後台面板與卡片補充微交互反饋。
+- 所有動畫尊重 `prefers-reduced-motion: reduce`，並優先只動畫 `transform` 與 `opacity` 以降低性能風險。
 
 ## 發布流程
 
