@@ -2378,17 +2378,22 @@ function AdminPage({ navigate }) {
           </div>
           <div className="content-editor">
             <aside className="page-list">
-              <label>{t.selectPage}
-                <select value={selectedPage} onChange={(event) => setSelectedPage(event.target.value)}>
-                  {editablePagePaths.map((path) => <option key={path} value={path}>{pageNames[path]}</option>)}
-                </select>
-              </label>
-              {editablePagePaths.map((path) => (
-                <button key={path} className={selectedPage === path ? "is-active" : ""} onClick={() => setSelectedPage(path)}>
-                  <span>{pageNames[path]}</span>
-                  <small>{path}</small>
-                </button>
-              ))}
+              <div className="page-select">
+                <label htmlFor="admin-page-select">{t.selectPage}</label>
+                <div className="select-shell">
+                  <select id="admin-page-select" value={selectedPage} onChange={(event) => setSelectedPage(event.target.value)}>
+                    {editablePagePaths.map((path) => <option key={path} value={path}>{pageNames[path]}</option>)}
+                  </select>
+                </div>
+              </div>
+              <div className="page-list-scroll" aria-label={t.selectPage}>
+                {editablePagePaths.map((path) => (
+                  <button key={path} className={selectedPage === path ? "is-active" : ""} onClick={() => setSelectedPage(path)}>
+                    <span>{pageNames[path]}</span>
+                    <small>{path}</small>
+                  </button>
+                ))}
+              </div>
             </aside>
 
             <div className="content-editor-main">
