@@ -45,6 +45,14 @@ const image = {
     "https://www.hcfsme.org/wp-content/uploads/2023/03/how-it-works.jpg",
     "https://www.hcfsme.org/wp-content/uploads/2024/03/sec_section-banner-05.jpg",
   ],
+  news: [
+    "https://www.hcfsme.org/wp-content/uploads/2024/06/frc-6deffb397e74f4ff88845165d91ea5a7.jpeg",
+    "https://www.hcfsme.org/wp-content/uploads/2024/03/20211119_145409620_iOS-scaled-e1637544896380.jpeg",
+    "https://www.hcfsme.org/wp-content/uploads/2024/03/34.jpeg",
+    "https://www.hcfsme.org/wp-content/uploads/2023/02/blog-title-img.jpg",
+    "https://www.hcfsme.org/wp-content/uploads/2024/03/funding-2-FTA-TVP.jpg",
+    "https://www.hcfsme.org/wp-content/uploads/2024/03/sec_section-banner-05.jpg",
+  ],
   industryIcons: [
     "https://www.hcfsme.org/wp-content/uploads/2024/06/47.png",
     "https://www.hcfsme.org/wp-content/uploads/2024/06/33.png",
@@ -995,11 +1003,11 @@ function NewsStrip({ navigate }) {
 function NewsPage() {
   return (
     <>
-      <PageHero {...pages["/news"]} imageUrl={image.gallery[3]} />
+      <PageHero {...pages["/news"]} imageUrl={image.news[3]} />
       <section className="section news-grid">
         {news.map((item, index) => (
           <article key={item.title}>
-            <img src={image.gallery[index % image.gallery.length]} alt="" />
+            <img src={image.news[index % image.news.length]} alt={`${item.title} 活動圖片`} />
             <div>
               <span><CalendarBlank size={16} /> {item.date}</span>
               <h2>{item.title}</h2>
@@ -1031,7 +1039,7 @@ function PhotoPage() {
 function ActivitiesPage({ navigate }) {
   return (
     <>
-      <PageHero {...pages["/activities"]} imageUrl={image.gallery[2]} />
+      <PageHero {...pages["/activities"]} imageUrl={image.news[0]} />
       <section className="section activity-grid">
         {[
           ["近期活動預告", "培訓、研討會、考察團、接待來訪團及政府機構交流安排。", "/subscribe"],
@@ -1040,7 +1048,7 @@ function ActivitiesPage({ navigate }) {
           ["現正招展／報名", "後續可接入展覽、贊助、活動報名與席位查詢入口。", "/application"],
         ].map(([title, desc, path], index) => (
           <article key={title}>
-            <img src={image.gallery[index % image.gallery.length]} alt="" />
+            <img src={image.news[index % image.news.length]} alt={`${title} 活動圖片`} />
             <div>
               <h2>{title}</h2>
               <p>{desc}</p>

@@ -654,6 +654,7 @@ h3 {
   height: 240px;
   width: 100%;
   object-fit: cover;
+  object-position: center 42%;
 }
 
 .news-grid article > div {
