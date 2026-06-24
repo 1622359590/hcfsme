@@ -8,6 +8,7 @@ import {
   Buildings,
   CalendarBlank,
   CaretDown,
+  DownloadSimple,
   EnvelopeSimple,
   GlobeHemisphereEast,
   Handshake,
@@ -15,6 +16,7 @@ import {
   MapPin,
   Phone,
   ShieldCheck,
+  UsersThree,
   X,
 } from "@phosphor-icons/react";
 import "./styles.css";
@@ -73,30 +75,59 @@ const contact = {
 const nav = [
   { label: "首頁", path: "/" },
   {
-    label: "關於商會",
+    label: "關於港中聯",
     path: "/about",
     children: [
       { label: "商會簡介", path: "/intro" },
+      { label: "商會章程", path: "/charter" },
       { label: "商會架構", path: "/structure" },
-      { label: "會董名錄", path: "/directors" },
+      { label: "會董暨名譽職務", path: "/directors" },
+      { label: "行業委員會", path: "/industry" },
+      { label: "聯絡我們", path: "/contact" },
     ],
   },
-  { label: "商會服務", path: "/services" },
-  { label: "行業委員會", path: "/industry" },
-  { label: "新聞動態", path: "/news" },
-  { label: "商會相冊", path: "/photo" },
+  {
+    label: "商會服務",
+    path: "/services",
+    children: [
+      { label: "政府資助申請輔導", path: "/services" },
+      { label: "行業委員會與交流平台", path: "/services" },
+      { label: "大灣區商務對接", path: "/services" },
+      { label: "企業培訓與研討會", path: "/services" },
+      { label: "廠商資源對接", path: "/services" },
+    ],
+  },
+  {
+    label: "商會活動",
+    path: "/activities",
+    children: [
+      { label: "近期活動預告", path: "/activities" },
+      { label: "活動回顧", path: "/news" },
+      { label: "商會相冊", path: "/photo" },
+    ],
+  },
   {
     label: "會員服務",
     path: "/member-services",
     children: [
+      { label: "會員類別及權益", path: "/member-benefits" },
       { label: "入會須知", path: "/membership" },
+      { label: "線上入會預登記", path: "/application" },
       { label: "會員服務協議", path: "/agreement" },
       { label: "實名認證協議", path: "/certification" },
       { label: "資訊保護政策", path: "/protection" },
     ],
   },
-  { label: "聯絡我們", path: "/contact" },
-  { label: "訂閱我們", path: "/subscribe" },
+  {
+    label: "資訊中心",
+    path: "/resources",
+    children: [
+      { label: "新聞稿", path: "/news" },
+      { label: "政策與商機資訊", path: "/resources" },
+      { label: "公告", path: "/announcements" },
+    ],
+  },
+  { label: "資源下載", path: "/downloads" },
 ];
 
 const mission = [
@@ -109,14 +140,17 @@ const mission = [
 ];
 
 const associationIntro = [
-  "香港中小企業工商聯合會(HCFSME港中聯)，是一家香港政府法定公認的非盈利國際組織。作為香港政府認可及支持的重要商會，香港中小企業工商聯合會自1998年創會以來，目前擁有三十多個行業委員會。",
-  "本會在香港政府指導下，一直以來都以服務及支援會員單位為己任，以支援全球華人地區中小企業為使命，聚集香港工商業各界優秀企業代表，以強企之心，行助企之事。港中聯將持續以中央政府和香港政府為後盾，貫徹「商 源 香 江，惠 通 全 球」的宗旨。",
+  "香港中小企業工商聯合會（簡稱「港中聯」或 HCFSME）成立於1998年，是香港特區政府認可及支持的非牟利工商團體（擔保有限公司）。",
+  "本會秉承「商源香江，惠通全球」的宗旨，致力於團結香港工商界專業人士及廣大中小企業，構建集政策建言、商務對接、資源共享於一體的高端交流平台。",
+  "面對全球經濟格局變化及粵港澳大灣區的發展機遇，港中聯充分發揮香港「超級聯繫人」角色，協助會員企業開拓海內外市場，特別是大灣區及東南亞新興市場。",
 ];
 
 const associationPurpose = [
-  "凝聚百年香江商業魅力，貫通新世代東亞發展能量，連接新興產業國事業機遇，傳播工業文明強盛經驗，實現全球中小企業之共贏未來。",
-  "本會全力推動及維護中小企業權益，面向全球助力各國政府優化投資及營商環境，加強本地與各國各級政府部門及領導官員的聯繫，凝聚業界，提升競爭力，共同拓展商機。",
-  "本會亦秉承「和文化思想」核心理念，以促進人與自然、社會及跨文化之和諧共生為責任，並在商務活動中積極推廣「和文化」宣傳教育工作。",
+  "團結香港中小型企業及工商界力量，維護會員合法權益。",
+  "促進香港與內地，特別是大灣區及海外工商交流合作，發揮香港「超級聯繫人」角色，搭建內聯外拓商務對接平台。",
+  "向特區政府及有關機構反映中小企訴求，參與公共政策諮詢。",
+  "舉辦工商研討、培訓、考察、政策解讀及聯誼活動，推動中小企轉型升級及持續發展。",
+  "弘揚誠信經商、愛港愛國精神，服務社會及業界福祉。",
 ];
 
 const associationStory = [
@@ -135,6 +169,103 @@ const funds = [
   ["中小企業市場推廣基金", "鼓勵中小企業參與出口推廣活動，協助擴展香港境外市場。"],
   ["科技券", "支援本地企業及機構使用科技服務和方案，提高生產力並升級轉型。"],
   ["BUD專項基金", "協助香港中小企業融資、擴展海外市場及提高競爭力。"],
+];
+
+const coreServices = [
+  {
+    title: "政府資助與科創扶持",
+    value: "降低企業轉型成本，提升申請成功率。",
+    items: [
+      ["TVP 科技券計劃輔導", "協助企業評估 ERP 升級、網絡安全方案及雲端系統建設等申請可行性，支援申請文件整理。"],
+      ["創新及科技基金", "對接企業支援計劃、配對補助及大學科研團隊合作機會。"],
+      ["專利申請資助", "協助專利檢索、技術交底書撰寫及官方流程跟進。"],
+      ["中小企業市場推廣基金", "支援出口推廣活動，協助企業拓展香港境外市場。"],
+      ["BUD 專項基金", "協助企業取得融資、擴展海外市場及提升競爭力。"],
+      ["專項診斷服務", "提供資助資格預審，定制資助組合方案，提高獲批率。"],
+    ],
+  },
+  {
+    title: "行業委員會與精英社群",
+    value: "垂直深耕，打破資訊壁壘，共享圈層資源。",
+    items: [
+      ["三十餘行業委員會", "涵蓋大健康、金融科技、人工智慧、新零售、專業服務等領域。"],
+      ["會董會閉門會議", "高端閉門論壇，探討宏觀經濟、資本運作及產業策略。"],
+      ["行業月度沙龍", "定期舉辦會員聚會、標杆企業走訪與跨界交流。"],
+      ["產業鏈對接平台", "建立企業庫，透過線上平台及線下推介會精準匹配供應商與採購商。"],
+    ],
+  },
+  {
+    title: "大灣區商務落地與拓展",
+    value: "發揮超級聯繫人角色，助力企業北上南下無縫銜接。",
+    items: [
+      ["內地商事登記諮詢", "提供大灣區城市公司註冊、外資備案及地址託管諮詢。"],
+      ["香港公司文件公證", "協辦香港公司全套公證，用於內地開戶、訴訟或合資經營。"],
+      ["政府招商精準對接", "組織企業與大灣區各級政府招商部門一對一洽談。"],
+      ["跨境考察團", "定期組織大灣區產業考察團及東南亞出海考察團。"],
+      ["跨境財稅法務支援", "轉介合作律師及會計師事務所，協助處理稅務籌劃及合規問題。"],
+    ],
+  },
+  {
+    title: "企業進階培訓與智庫",
+    value: "賦能管理層，應對新時代商業挑戰。",
+    items: [
+      ["創科與數碼化轉型", "涵蓋 AI 應用、Web3.0、企業數據安全合規等課程。"],
+      ["ESG 可持續發展", "協助企業建立 ESG 報告框架，應對披露要求及綠色金融需求。"],
+      ["品牌出海行銷", "提供海外社媒、網紅帶貨、海外倉儲及物流解決方案。"],
+      ["家族辦公室與傳承", "面向會董級成員，提供財富管理、二代接班及家族信託研修。"],
+    ],
+  },
+  {
+    title: "廠商資源對接與貿易合規",
+    value: "對標成熟工商會服務標準，提供一站式貿易支援。",
+    items: [
+      ["原產地證協助對接", "協助企業了解一般原產地證及優惠產地證申請流程。"],
+      ["特定自貿區證書", "支援中國-東盟自貿區、亞太貿易協定等區域證書諮詢。"],
+      ["產品檢測認證轉介", "對接 STC、SGS、TÜV 等權威機構辦理產品認證。"],
+      ["香港 Q 嘜優質標誌", "協助企業了解 Q 嘜認證，提升品牌信譽度。"],
+      ["跨境物流與供應鏈", "推薦貨代及報關資源，協助處理海關查驗及單證整理。"],
+    ],
+  },
+];
+
+const charterSections = [
+  ["總則", "本會中文定名為「香港中小企業工商聯合會」，簡稱「港中聯」；英文名稱為 Hong Kong Confederation of Small and Medium Enterprises Industry and Commerce。"],
+  ["會員體系", "本會實行分級會員體系，分為企業會員及個人會員。申請入會須提交申請表及相關證明文件，經審核並繳納入會基金及會費後成為正式會員。"],
+  ["會員權利", "會員享有選舉權、被選舉權及表決權，並可對會務提出批評、建議及監督，優先參加培訓、研討、考察及會員福利活動。"],
+  ["會員義務", "會員須遵守章程及會議決議，維護本會名譽，促進會員間互助合作，並按期繳納入會基金及常年會費。"],
+  ["組織架構", "會員大會為最高權力機構；會董會為核心領導機構；監事委員會獨立行使監察權；秘書處負責日常會務行政工作。"],
+  ["會議與經費", "會員大會每年召開一次。本會經費來源包括會費、捐款、贊助、政府或機構資助及其他合法收入，經費僅用於達成宗旨之相關活動。"],
+];
+
+const governanceGroups = [
+  ["會董會", "戰略領航，最高決策。審議及批准重大投資、戰略規劃及人事任免。", "蔣文凱 Elisa、韓君 Alex Han、鄭綺文 Elaine Cheng、李迎春 Shirley Li、譚耀泉、禹雲均"],
+  ["監察委員會", "獨立監察會務運作合規性，審計財務狀況，防範運營風險。", "黃桂林、梁志超"],
+  ["名譽主席團", "借助社會影響力與資源網絡，提升聯合會公信力及對外聯絡層次。", "勞英夫、劉衛東、羅文浩、彭樹穩、鄭偉俊、許倩華、謝燕飛"],
+  ["顧問團隊", "提供專業諮詢、決策支持與智力服務。", "呂志豪、陳佩斯、蘇彥威"],
+  ["應屆執行委員會", "負責落實會董會決議及日常會務運作。", "會長鄭綺文、指導主席譚耀泉、執行會長曾崇瑞、秘書長胡海燕"],
+];
+
+const committeeGroups = [
+  ["大健康及生物科技產業", "23 人", ["大健康產業發展委員會", "健康產業發展委員會", "健康環保科技委員會", "生物科技發展委員會", "生物科技皮膚健康委員會", "眼健康產業發展委員會"]],
+  ["金融及資產管理產業", "16 人", ["金融發展委員會", "金融業界發展委員會", "保險界委員會", "互聯網金融委員會", "供應鏈金融發展委員會", "新金融資管傳承委員會", "上市產業專家委員會"]],
+  ["科技、數智及新興產業", "14 人", ["Web3.0/人工智慧產業發展委員會", "數智化發展委員會", "數字文旅產業發展委員會", "元宇宙行業發展委員會", "新媒體產業發展委員會", "智能家居行業委員會"]],
+  ["灣區融合及區域發展", "14 人", ["大灣區發展籌委會", "深圳發展委員會", "產業培育委員會", "港品發展委員會", "專業移民發展委員會", "專業移民顧問發展委員會"]],
+  ["服務業、零售及消費產業", "22 人", ["餐飲業委員會", "批發及零售委員會", "新零售產業發展委員會", "品牌推廣發展委員會", "美容化妝業界委員會", "旅遊業界發展委員會", "時尚產業發展委員會", "鐘錶業界發展委員會", "房地產業發展委員會"]],
+  ["區域發展與辦事處", "6 個", ["佛山辦事處", "福建辦事處", "杭州辦事處", "洛陽辦事處", "重慶辦事處", "遼寧分會"]],
+];
+
+const memberBenefits = [
+  ["企業會員", "香港或境外依法註冊之工商企業、行業商會或公會，可指定代表行使會員權利。"],
+  ["個人會員", "企業東主、合夥人、高管或具中小企管理經驗之專業人士，可直接申請入會。"],
+  ["會員權益", "優先參加培訓、研討、考察、政策解讀、會員福利活動及行業委員會交流。"],
+  ["會務參與", "入會滿三個月後享有選舉及被選舉權，可對會務提出建議及監督。"],
+];
+
+const downloads = [
+  ["商會章程", "查看章程摘要，後續可接入 PDF 下載。", "/charter"],
+  ["入會申請表", "企業及個人會員申請資料準備指引。", "/application"],
+  ["資助計劃簡介", "TVP、BUD、ITF、市場推廣基金等服務資料。", "/services"],
+  ["活動相冊", "商會活動影像記錄與年度回顧。", "/photo"],
 ];
 
 const directors = [
@@ -230,19 +361,26 @@ const legalPages = {
 
 const pages = {
   "/": { title: "商源香江 惠通全球", subtitle: "香港中小企業工商聯合會" },
-  "/about": { title: "關於商會", subtitle: "法定公認的非盈利國際商會組織" },
-  "/intro": { title: "商會簡介", subtitle: "紮根大中華，立足香港，服務全球中小企業" },
-  "/structure": { title: "商會架構", subtitle: "清晰治理架構，連接商會、會員與產業資源" },
-  "/directors": { title: "會董名錄", subtitle: "聚集香港工商業各界優秀企業代表" },
-  "/services": { title: "商會服務", subtitle: "協助企業連接政策、資金、市場與合作機會" },
-  "/industry": { title: "行業委員會", subtitle: "凝聚行業精英，共同面對挑戰，把握機遇" },
+  "/about": { title: "關於港中聯", subtitle: "香港特區政府認可及支持的非牟利工商團體" },
+  "/intro": { title: "商會簡介", subtitle: "立足香港，背靠祖國，聯通世界" },
+  "/charter": { title: "商會章程", subtitle: "會員體系、會務治理與組織運作準則" },
+  "/structure": { title: "組織架構", subtitle: "會董會、監察委員會、執行委員會與專業分支機構" },
+  "/directors": { title: "會董暨名譽職務", subtitle: "聚集香港工商業各界優秀企業代表與專業顧問" },
+  "/services": { title: "商會服務", subtitle: "五大核心服務體系，支援企業轉型、落地與出海" },
+  "/industry": { title: "行業委員會", subtitle: "六大產業板塊，三十餘個專業委員會" },
+  "/activities": { title: "商會活動", subtitle: "近期活動、年度盛事、交流考察與活動回顧" },
   "/news": { title: "新聞動態", subtitle: "記錄港中聯的重要活動、合作與商會消息" },
   "/photo": { title: "商會相冊", subtitle: "活動現場、交流片段與商會影像記錄" },
-  "/member-services": { title: "會員服務", subtitle: "會員註冊、入會申請、協議與資訊保護" },
+  "/member-services": { title: "會員服務", subtitle: "會員權益、入會流程、預登記與協議政策" },
+  "/member-benefits": { title: "會員類別及權益", subtitle: "企業會員、個人會員與會務參與權利" },
   "/membership": { title: "企業商會入會須知", subtitle: "線上完成申請、認證、繳費與協議簽署" },
+  "/application": { title: "線上入會預登記", subtitle: "留下聯絡資料，秘書處將協助跟進入會流程" },
   "/agreement": legalPages.agreement,
   "/certification": legalPages.certification,
   "/protection": legalPages.protection,
+  "/resources": { title: "資訊中心", subtitle: "新聞稿、政策與商機資訊、公告及調研摘錄" },
+  "/announcements": { title: "公告", subtitle: "入會公示、會議通知與會務公告" },
+  "/downloads": { title: "資源下載", subtitle: "章程、入會表格、資助計劃與活動資料入口" },
   "/contact": { title: "聯絡我們", subtitle: "我們的全球辦事處與秘書處聯絡方式" },
   "/subscribe": { title: "訂閱我們", subtitle: "收取更多本會宣傳資訊與 Newsletter" },
 };
@@ -330,7 +468,7 @@ function App() {
     });
 
     ScrollTrigger.batch(
-      ".support-card, .director-row article, .director-grid article, .news-row article, .news-grid article, .service-links button, .fund-list article, .offices article, .legal article, .steps article, .industry-icons figure",
+      ".support-card, .director-row article, .director-grid article, .news-row article, .news-grid article, .service-links button, .fund-list article, .offices article, .legal article, .steps article, .industry-icons figure, .governance-list article, .committee-board article, .service-panel, .activity-grid article, .benefit-grid article, .resource-list article, .download-list button",
       {
         start: "top 88%",
         once: true,
@@ -413,7 +551,7 @@ function Header({ path, navigate, mobileOpen, setMobileOpen }) {
                 <div className="dropdown">
                   {item.children.map((child) => (
                     <button
-                      key={child.path}
+                      key={`${item.label}-${child.label}`}
                       onClick={() => {
                         navigate(child.path);
                         setMobileOpen(false);
@@ -436,15 +574,22 @@ function RenderPage({ path, navigate }) {
   if (path === "/") return <Home navigate={navigate} />;
   if (path === "/about") return <AboutPage navigate={navigate} />;
   if (path === "/intro") return <IntroPage />;
+  if (path === "/charter") return <CharterPage />;
   if (path === "/structure") return <StructurePage />;
   if (path === "/directors") return <DirectorsPage />;
   if (path === "/services") return <ServicesPage />;
   if (path === "/industry") return <IndustryPage />;
+  if (path === "/activities") return <ActivitiesPage navigate={navigate} />;
   if (path === "/news") return <NewsPage />;
   if (path === "/photo") return <PhotoPage />;
   if (path === "/member-services") return <MemberServices navigate={navigate} />;
+  if (path === "/member-benefits") return <MemberBenefitsPage />;
   if (path === "/membership") return <MembershipPage />;
+  if (path === "/application") return <ApplicationPage />;
   if (["/agreement", "/certification", "/protection"].includes(path)) return <LegalPage data={pages[path]} />;
+  if (path === "/resources") return <ResourcesPage navigate={navigate} />;
+  if (path === "/announcements") return <AnnouncementsPage />;
+  if (path === "/downloads") return <DownloadsPage navigate={navigate} />;
   if (path === "/contact") return <ContactPage />;
   if (path === "/subscribe") return <SubscribePage />;
   return <Home navigate={navigate} />;
@@ -629,12 +774,68 @@ function StructurePage() {
   return (
     <>
       <PageHero {...pages["/structure"]} imageUrl={image.structure} />
-      <section className="section image-panel">
-        <div>
-          <h2>商會架構圖</h2>
-          <p>以會董會、監察委員會、執行會長及各行業委員會形成協作治理架構。</p>
+      <section className="section org-overview">
+        <div className="org-lead">
+          <h2>會董會領航，執行委員會落地，專業分支機構連接產業。</h2>
+          <p>新版組織架構按治理職能與產業屬性拆分，讓會員可以清楚理解決策、監察、日常運作與行業服務之間的關係。</p>
         </div>
-        <img src={image.structure} alt="香港中小企業工商聯合會組織結構圖" />
+        <div className="org-stats">
+          <div><span>137</span><p>位成員</p></div>
+          <div><span>6</span><p>大產業板塊</p></div>
+          <div><span>30+</span><p>專業委員會</p></div>
+        </div>
+      </section>
+      <section className="section governance-list">
+        {governanceGroups.map(([title, desc, people]) => (
+          <article key={title}>
+            <h2>{title}</h2>
+            <p>{desc}</p>
+            <span>{people}</span>
+          </article>
+        ))}
+      </section>
+      <section className="section committee-board">
+        <div className="section-heading">
+          <h2>專業分支機構</h2>
+          <p>按產業屬性劃分為六大板塊，逐步承接行業交流、政策解讀、企業走訪與資源對接。</p>
+        </div>
+        <div className="committee-list">
+          {committeeGroups.map(([title, count, items]) => (
+            <article key={title}>
+              <div>
+                <h3>{title}</h3>
+                <span>{count}</span>
+              </div>
+              <p>{items.join("、")}</p>
+            </article>
+          ))}
+        </div>
+      </section>
+    </>
+  );
+}
+
+function CharterPage() {
+  return (
+    <>
+      <PageHero {...pages["/charter"]} imageUrl={image.side} />
+      <section className="section two-col">
+        <div>
+          <p className="kicker">章程摘要</p>
+          <h2>以清晰治理保障會員權益與會務運作。</h2>
+        </div>
+        <div className="rich-text">
+          <p>本章程摘要整理自《香港中小企業工商聯合會章程》，涵蓋本會名稱、宗旨、會員體系、會員權利義務、組織架構、會議、經費及章程修訂等核心條款。</p>
+          <p>完整章程文件可於「資源下載」頁後續接入 PDF 或 Word 版本，供會員查閱及下載。</p>
+        </div>
+      </section>
+      <section className="section legal charter-grid">
+        {charterSections.map(([title, body]) => (
+          <article key={title}>
+            <h2>{title}</h2>
+            <p>{body}</p>
+          </article>
+        ))}
       </section>
     </>
   );
@@ -685,32 +886,35 @@ function ServicesPage() {
       <PageHero {...pages["/services"]} imageUrl={image.funding} />
       <section className="section two-col">
         <div>
-          <p className="kicker">商會介紹</p>
-          <h2>紮根大中華，立足香港，服務全球中小企業</h2>
+          <p className="kicker">核心服務體系</p>
+          <h2>從資助申請到跨境落地，將商會網絡轉化為企業行動力。</h2>
         </div>
         <div className="rich-text">
           <p>
-            港中聯成立於1998年，以「紮根大中華，立足香港，服務全球中小企業」為發展理念，擁有30多個行業委員會。建會26年以來，港中聯在多個省市政府成功招商，幫助多家中小企業獲得發展機遇，完成事業升級，取得政府支持。
+            新版商會服務按照文件建議整理為五大板塊，強調顆粒度細化與專業度提升。每個板塊都對應企業在不同階段會遇到的實際需求：資助、社群、落地、培訓與貿易合規。
           </p>
-          {[
-            "作為全球化的堅定推動者，與世界各國政府、商協會、企業建立廣泛的關係，積極推動技術與環球市場發展。",
-            "向發展中國家的中小企業傳播香港與東亞新興工業國家的企業發展經驗。",
-            "擔當中小企業和政府的溝通橋樑和紐帶，協助解決中小企業的營商問題。",
-            "拓展中小企面對世界商機，協助政府招商引資、招才引智。",
-            "推動企業社會責任，為全球經濟出謀獻策，有利中小企持續發展。凝聚各國商協會和企業的關係，創造共同價值。",
-          ].map((item) => <p key={item}>{item}</p>)}
+          <p>港中聯將透過三十餘個行業委員會、政府及專業機構網絡，為香港及內地中小企業提供可執行、可轉介、可跟進的服務入口。</p>
         </div>
       </section>
-      <section className="section fund-list">
-        <h2>了解更多政府中小企資助</h2>
-        <div>
-          {funds.map(([title, desc]) => (
-            <article key={title}>
-              <h3>{title}</h3>
-              <p>{desc}</p>
-            </article>
-          ))}
-        </div>
+      <section className="section service-system">
+        {coreServices.map((group, index) => (
+          <article key={group.title} id={`service-${index + 1}`} className="service-panel">
+            <div className="service-panel-head">
+              <span>{String(index + 1).padStart(2, "0")}</span>
+              <h3>服務項目</h3>
+            </div>
+            <h2>{group.title}</h2>
+            <p>{group.value}</p>
+            <div>
+              {group.items.map(([itemTitle, itemDesc]) => (
+                <section key={itemTitle}>
+                  <h3>{itemTitle}</h3>
+                  <p>{itemDesc}</p>
+                </section>
+              ))}
+            </div>
+          </article>
+        ))}
       </section>
       <section className="section faq">
         <h2>常見問題</h2>
@@ -738,13 +942,26 @@ function IndustryPage() {
     <>
       <PageHero {...pages["/industry"]} imageUrl={image.side} />
       <section className="section purpose">
-        <h2>共建更繁榮、永續的行業環境</h2>
+        <h2>六大產業板塊，承接三十餘個行業委員會。</h2>
         <p>
-          在快速變化的商業世界中，行業委員會扮演著至關重要的角色。 我們不僅是一個集體的聲音，更是推動行業進步、促進交流合作的橋樑。 我們的使命是通過彙聚行業精英的智慧與力量，共同面對挑戰，把握機遇，塑造一個更加繁榮、永續的行業環境。
+          行業委員會是港中聯推動精準服務與會員互助的核心機制。每個板塊會逐步承接政策解讀、行業沙龍、標杆企業走訪、產業鏈對接及負責人介紹。
         </p>
       </section>
+      <section className="section committee-board">
+        <div className="committee-list">
+          {committeeGroups.map(([title, count, items]) => (
+            <article key={title}>
+              <div>
+                <h3>{title}</h3>
+                <span>{count}</span>
+              </div>
+              <p>{items.join("、")}</p>
+            </article>
+          ))}
+        </div>
+      </section>
       <section className="section industry-icons" aria-label="行業委員會圖示">
-        {image.industryIcons.map((src, index) => (
+        {image.industryIcons.slice(0, 12).map((src, index) => (
           <figure key={src}>
             <img src={src} alt={`行業委員會圖示 ${index + 1}`} />
           </figure>
@@ -811,19 +1028,47 @@ function PhotoPage() {
   );
 }
 
+function ActivitiesPage({ navigate }) {
+  return (
+    <>
+      <PageHero {...pages["/activities"]} imageUrl={image.gallery[2]} />
+      <section className="section activity-grid">
+        {[
+          ["近期活動預告", "培訓、研討會、考察團、接待來訪團及政府機構交流安排。", "/subscribe"],
+          ["活動回顧", "按年度整理活動圖文、影音與新聞稿，呈現商會服務軌跡。", "/news"],
+          ["年度盛事介紹", "包括高峰論壇、頒獎典禮、簽約儀式及跨境交流活動。", "/photo"],
+          ["現正招展／報名", "後續可接入展覽、贊助、活動報名與席位查詢入口。", "/application"],
+        ].map(([title, desc, path], index) => (
+          <article key={title}>
+            <img src={image.gallery[index % image.gallery.length]} alt="" />
+            <div>
+              <h2>{title}</h2>
+              <p>{desc}</p>
+              <button className="text-button" onClick={() => navigate(path)}>查看入口 <ArrowRight size={16} /></button>
+            </div>
+          </article>
+        ))}
+      </section>
+      <NewsStrip navigate={navigate} />
+    </>
+  );
+}
+
 function MemberServices({ navigate }) {
   return (
     <>
       <PageHero {...pages["/member-services"]} imageUrl={image.funding} />
       <section className="section purpose">
-        <h2>Member services</h2>
+        <h2>從了解權益，到完成入會，再到持續參與商會活動。</h2>
         <p>
-          原站會員服務頁作為會員相關入口頁，集中連到入會須知、會員服務協議、實名認證協議與資訊保護政策。
+          會員服務頁整合會員類別及權益、入會流程、預登記、協議政策與後期會員登入入口，讓香港及內地企業主可以更快找到下一步。
         </p>
       </section>
       <section className="section service-links">
         {[
+          ["/member-benefits", "會員類別及權益", "了解企業會員、個人會員、會務參與與活動優先權益。"],
           ["/membership", "入會須知", "了解電子簽約入會流程、服務費及認證要求。"],
+          ["/application", "線上入會預登記", "留下公司、職位、聯絡方式及感興趣服務，秘書處跟進。"],
           ["/agreement", "會員服務協議", "查看會員服務、費用、權利義務與爭議處理條款。"],
           ["/certification", "實名認證協議", "了解實名認證、數字證書與電子簽名服務規則。"],
           ["/protection", "資訊保護政策", "查看法律聲明、個人資訊保護與用戶權利。"],
@@ -835,6 +1080,27 @@ function MemberServices({ navigate }) {
             <span>進入頁面 <ArrowRight size={16} /></span>
           </button>
         ))}
+      </section>
+    </>
+  );
+}
+
+function MemberBenefitsPage() {
+  return (
+    <>
+      <PageHero {...pages["/member-benefits"]} imageUrl={image.meeting} />
+      <section className="section benefit-grid">
+        {memberBenefits.map(([title, desc]) => (
+          <article key={title}>
+            <UsersThree size={34} />
+            <h2>{title}</h2>
+            <p>{desc}</p>
+          </article>
+        ))}
+      </section>
+      <section className="section purpose">
+        <h2>會員責任</h2>
+        <p>會員須遵守本會章程及會員大會、會董會、執行委員會決議，維護本會名譽，促進會員間互助合作，並按期繳納入會基金及常年會費。</p>
       </section>
     </>
   );
@@ -870,6 +1136,29 @@ function MembershipPage() {
   );
 }
 
+function ApplicationPage() {
+  return (
+    <>
+      <PageHero {...pages["/application"]} imageUrl={image.gallery[1]} />
+      <section className="section application-panel">
+        <div>
+          <h2>預登記資料</h2>
+          <p>目前表單為前端預登記入口，後續可接入後台或郵件提交。提交前不會向外部傳送資料。</p>
+        </div>
+        <form onSubmit={(event) => event.preventDefault()}>
+          <label>姓名<input type="text" placeholder="請輸入姓名" /></label>
+          <label>公司名稱<input type="text" placeholder="請輸入公司名稱" /></label>
+          <label>職位<input type="text" placeholder="請輸入職位" /></label>
+          <label>聯絡電話<input type="tel" placeholder="+852 / +86" /></label>
+          <label>電郵地址<input type="email" placeholder="name@example.com" /></label>
+          <label className="full">感興趣服務<input type="text" placeholder="例如：政府資助、大灣區對接、行業委員會、企業培訓" /></label>
+          <button className="primary" type="submit">提交預登記 <ArrowRight size={18} /></button>
+        </form>
+      </section>
+    </>
+  );
+}
+
 function LegalPage({ data }) {
   return (
     <>
@@ -881,6 +1170,64 @@ function LegalPage({ data }) {
             <h2>{title}</h2>
             <p>{body}</p>
           </article>
+        ))}
+      </section>
+    </>
+  );
+}
+
+function ResourcesPage({ navigate }) {
+  return (
+    <>
+      <PageHero {...pages["/resources"]} imageUrl={image.gallery[3]} />
+      <section className="section resource-list">
+        {[
+          ["新聞稿", "按年度整理港中聯活動、合作、簽約與會務消息。", "/news"],
+          ["政策與商機資訊", "聚合香港及大灣區最新扶持政策、資助計劃及調研摘錄。", "/services"],
+          ["公告", "入會公示、會議通知及商會重要事項公告。", "/announcements"],
+        ].map(([title, desc, path]) => (
+          <article key={title}>
+            <h2>{title}</h2>
+            <p>{desc}</p>
+            <button className="text-button" onClick={() => navigate(path)}>前往查看 <ArrowRight size={16} /></button>
+          </article>
+        ))}
+      </section>
+    </>
+  );
+}
+
+function AnnouncementsPage() {
+  return (
+    <>
+      <PageHero {...pages["/announcements"]} imageUrl={image.side} />
+      <section className="section legal">
+        {[
+          ["入會公示", "後續可在此發布新會員公示、會籍變更及除名通知。"],
+          ["會議通知", "後續可發布會員大會、會董會、監事委員會及行業委員會會議安排。"],
+          ["會務公告", "後續可發布秘書處通知、服務調整、活動報名與下載資料更新。"],
+        ].map(([title, body]) => (
+          <article key={title}>
+            <h2>{title}</h2>
+            <p>{body}</p>
+          </article>
+        ))}
+      </section>
+    </>
+  );
+}
+
+function DownloadsPage({ navigate }) {
+  return (
+    <>
+      <PageHero {...pages["/downloads"]} imageUrl={image.funding} />
+      <section className="section download-list">
+        {downloads.map(([title, desc, path]) => (
+          <button key={title} onClick={() => navigate(path)}>
+            <DownloadSimple size={30} />
+            <span>{title}</span>
+            <p>{desc}</p>
+          </button>
         ))}
       </section>
     </>
@@ -960,7 +1307,7 @@ function Footer({ navigate }) {
         <div>
           <h3>快速鏈接</h3>
           {quickLinks.map((item) => (
-            <button key={item.path} onClick={() => navigate(item.path)}>{item.label}</button>
+            <button key={`${item.path}-${item.label}`} onClick={() => navigate(item.path)}>{item.label}</button>
           ))}
         </div>
         <div>
