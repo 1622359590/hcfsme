@@ -310,6 +310,25 @@ const managementTeam = [
   ["禹雲均 Jacky Yu", "執行會長"],
 ];
 
+const defaultDirectorProfiles = directors.map(([name, role], index) => ({
+  name,
+  role,
+  imageUrl: image.directors[index % image.directors.length],
+}));
+
+const defaultManagementProfiles = managementTeam.map(([name, role], index) => ({
+  name,
+  role,
+  imageUrl: image.directors[index % image.directors.length],
+}));
+
+const defaultAboutContent = {
+  associationIntro: associationIntro.join("\n"),
+  associationPurpose: associationPurpose.join("\n"),
+  mission: mission.join("\n"),
+  associationStory: associationStory.join("\n"),
+};
+
 const news = [
   {
     title: "《天使基金助力企業、新媒體賦能品牌-港中聯十二月商聚圓滿成功！》",
@@ -457,6 +476,9 @@ const defaultEditableContent = {
   coreServices,
   memberBenefits,
   downloads,
+  directorProfiles: defaultDirectorProfiles,
+  managementProfiles: defaultManagementProfiles,
+  aboutContent: defaultAboutContent,
   pages: defaultPageContent,
 };
 
@@ -480,6 +502,9 @@ function mergeEditableContent(input = {}) {
     coreServices: Array.isArray(input.coreServices) ? input.coreServices : coreServices,
     memberBenefits: Array.isArray(input.memberBenefits) ? input.memberBenefits : memberBenefits,
     downloads: Array.isArray(input.downloads) ? input.downloads : downloads,
+    directorProfiles: Array.isArray(input.directorProfiles) ? input.directorProfiles : defaultDirectorProfiles,
+    managementProfiles: Array.isArray(input.managementProfiles) ? input.managementProfiles : defaultManagementProfiles,
+    aboutContent: { ...defaultAboutContent, ...(input.aboutContent || {}) },
     pages: pagesWithDefaults,
   };
 }
@@ -565,50 +590,50 @@ function App() {
       gsap.set(targets, { clearProps: "willChange" });
     };
 
-    const introTimeline = gsap.timeline({ defaults: { duration: 0.68 } });
+    const introTimeline = gsap.timeline({ defaults: { duration: 0.46 } });
     introTimeline
       .from(".site-header", { y: -16, autoAlpha: 0, duration: 0.38, clearProps: "all" })
       .from(".nav-item", {
         y: -8,
         autoAlpha: 0,
-        duration: 0.36,
+        duration: 0.24,
         stagger: 0.025,
         clearProps: "all",
       }, "-=0.14")
       .from(".hero-copy .kicker, .page-hero .kicker, .admin-top .kicker", {
         y: 12,
         autoAlpha: 0,
-        duration: 0.36,
+        duration: 0.24,
         clearProps: "all",
       }, "-=0.08")
       .from(".hero-copy h1, .page-hero h1, .admin-login h1, .admin-top h1", {
-        y: 34,
+        y: 22,
         autoAlpha: 0,
-        duration: 0.76,
+        duration: 0.46,
         clearProps: "all",
       }, "-=0.12")
       .from(".hero-copy > p:not(.kicker), .page-hero p, .admin-login > p, .admin-top > div:first-child > p", {
         y: 20,
         autoAlpha: 0,
-        duration: 0.58,
+        duration: 0.36,
         stagger: 0.055,
         clearProps: "all",
-      }, "-=0.42")
+      }, "-=0.28")
       .from(".hero-actions > *, .admin-top > div:last-child > *", {
         y: 16,
         scale: 0.98,
         autoAlpha: 0,
-        duration: 0.42,
+        duration: 0.3,
         stagger: 0.045,
         clearProps: "all",
-      }, "-=0.3")
+      }, "-=0.22")
       .from(".hero-image, .page-hero img", {
         y: 30,
         scale: 0.976,
         autoAlpha: 0,
-        duration: 0.88,
+        duration: 0.54,
         clearProps: "all",
-      }, "-=0.42")
+      }, "-=0.28")
       .from(".intro-band > div", {
         y: 24,
         autoAlpha: 0,
@@ -867,6 +892,14 @@ function EditablePageBlocks({ path }) {
   );
 }
 
+function textLines(value, fallback = []) {
+  const lines = String(value || "")
+    .split("\n")
+    .map((item) => item.trim())
+    .filter(Boolean);
+  return lines.length ? lines : fallback;
+}
+
 function Home({ navigate }) {
   const content = useContext(ContentContext) || defaultEditableContent;
   const homeContent = content.pages?.["/"] || defaultPageContent["/"];
@@ -944,6 +977,10 @@ function Home({ navigate }) {
 }
 
 function IntroPage() {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const introLines = textLines(content.aboutContent?.associationIntro, associationIntro);
+  const purposeLines = textLines(content.aboutContent?.associationPurpose, associationPurpose);
+  const missionLines = textLines(content.aboutContent?.mission, mission);
   return (
     <>
       <PageHero {...pages["/intro"]} imageUrl={image.side} />
@@ -953,17 +990,17 @@ function IntroPage() {
           <h2>香港特區政府法定公認的非盈利國際組織</h2>
         </div>
         <div className="rich-text">
-          {associationIntro.map((item) => <p key={item}>{item}</p>)}
+          {introLines.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
       <section className="section purpose">
         <h2>宗旨</h2>
-        {associationPurpose.map((item) => <p key={item}>{item}</p>)}
+        {purposeLines.map((item) => <p key={item}>{item}</p>)}
       </section>
       <section className="section mission-list">
         <h2>使命</h2>
         <div>
-          {mission.map((item) => (
+          {missionLines.map((item) => (
             <p key={item}>{item}</p>
           ))}
         </div>
@@ -973,6 +1010,12 @@ function IntroPage() {
 }
 
 function AboutPage({ navigate }) {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const introLines = textLines(content.aboutContent?.associationIntro, associationIntro);
+  const purposeLines = textLines(content.aboutContent?.associationPurpose, associationPurpose);
+  const missionLines = textLines(content.aboutContent?.mission, mission);
+  const storyLines = textLines(content.aboutContent?.associationStory, associationStory);
+  const managementProfiles = content.managementProfiles || defaultManagementProfiles;
   return (
     <>
       <PageHero {...pages["/about"]} imageUrl={image.meeting} />
@@ -982,17 +1025,17 @@ function AboutPage({ navigate }) {
           <h2>香港政府認可及支持的重要商會</h2>
         </div>
         <div className="rich-text">
-          {associationIntro.map((item) => <p key={item}>{item}</p>)}
+          {introLines.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
       <section className="section purpose">
         <h2>本會宗旨</h2>
-        {associationPurpose.map((item) => <p key={item}>{item}</p>)}
+        {purposeLines.map((item) => <p key={item}>{item}</p>)}
       </section>
       <section className="section mission-list">
         <h2>本會使命</h2>
         <div>
-          {mission.map((item) => <p key={item}>{item}</p>)}
+          {missionLines.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
       <section className="section two-col">
@@ -1001,7 +1044,7 @@ function AboutPage({ navigate }) {
           <h2>建會27年，連接香港與全球中小企業</h2>
         </div>
         <div className="rich-text">
-          {associationStory.map((item) => <p key={item}>{item}</p>)}
+          {storyLines.map((item) => <p key={item}>{item}</p>)}
         </div>
       </section>
       <section className="section image-panel">
@@ -1017,11 +1060,11 @@ function AboutPage({ navigate }) {
           <h2>聚集香港工商業各界優秀企業代表</h2>
         </div>
         <div className="director-row">
-          {managementTeam.map(([name, role], index) => (
-            <article key={name}>
-              <img src={image.directors[index % image.directors.length]} alt={name} />
-              <h3>{name}</h3>
-              <p>{role}</p>
+          {managementProfiles.map((person, index) => (
+            <article key={`${person.name}-${index}`}>
+              <img src={person.imageUrl || image.directors[index % image.directors.length]} alt={person.name} />
+              <h3>{person.name}</h3>
+              <p>{person.role}</p>
             </article>
           ))}
         </div>
@@ -1103,6 +1146,8 @@ function CharterPage() {
 }
 
 function DirectorsPreview() {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const directorItems = content.directorProfiles || defaultDirectorProfiles;
   return (
     <section className="section directors-preview">
       <div>
@@ -1110,11 +1155,11 @@ function DirectorsPreview() {
         <h2>會董會與監察委員會</h2>
       </div>
       <div className="director-row">
-        {directors.map(([name, role], index) => (
-          <article key={name}>
-            <img src={image.directors[index % image.directors.length]} alt={name} />
-            <h3>{name}</h3>
-            <p>{role}</p>
+        {directorItems.map((person, index) => (
+          <article key={`${person.name}-${index}`}>
+            <img src={person.imageUrl || image.directors[index % image.directors.length]} alt={person.name} />
+            <h3>{person.name}</h3>
+            <p>{person.role}</p>
           </article>
         ))}
       </div>
@@ -1123,16 +1168,18 @@ function DirectorsPreview() {
 }
 
 function DirectorsPage() {
+  const content = useContext(ContentContext) || defaultEditableContent;
+  const directorItems = content.directorProfiles || defaultDirectorProfiles;
   return (
     <>
       <PageHero {...pages["/directors"]} imageUrl={image.directors[0]} />
       <section className="section director-grid">
-        {directors.map(([name, role], index) => (
-          <article key={name}>
-            <img src={image.directors[index % image.directors.length]} alt={name} />
+        {directorItems.map((person, index) => (
+          <article key={`${person.name}-${index}`}>
+            <img src={person.imageUrl || image.directors[index % image.directors.length]} alt={person.name} />
             <div>
-              <h2>{name}</h2>
-              <p>{role}</p>
+              <h2>{person.name}</h2>
+              <p>{person.role}</p>
             </div>
           </article>
         ))}
@@ -1659,6 +1706,18 @@ function AdminPage({ navigate }) {
       removeService: "刪除服務板塊",
       benefitsSettings: "會員權益",
       downloadsSettings: "資源下載",
+      aboutSettings: "商會簡介文案",
+      associationIntro: "商會簡介（每段一行）",
+      associationPurpose: "本會宗旨（每段一行）",
+      mission: "本會使命（每段一行）",
+      associationStory: "商會故事（每段一行）",
+      directorsSettings: "會董名錄",
+      managementSettings: "管理團隊",
+      personName: "姓名",
+      personRole: "職務",
+      personImage: "人物圖片",
+      addPerson: "新增人物",
+      removePerson: "刪除人物",
       addItem: "新增一項",
       applications: "入會預登記",
       records: "筆",
@@ -1727,6 +1786,18 @@ function AdminPage({ navigate }) {
       removeService: "Remove service group",
       benefitsSettings: "Member benefits",
       downloadsSettings: "Downloads",
+      aboutSettings: "Association profile copy",
+      associationIntro: "Association intro, one paragraph per line",
+      associationPurpose: "Purpose, one paragraph per line",
+      mission: "Mission, one paragraph per line",
+      associationStory: "Story, one paragraph per line",
+      directorsSettings: "Directors",
+      managementSettings: "Management team",
+      personName: "Name",
+      personRole: "Role",
+      personImage: "Portrait",
+      addPerson: "Add person",
+      removePerson: "Remove person",
       addItem: "Add item",
       applications: "Applications",
       records: "records",
@@ -1997,6 +2068,28 @@ function AdminPage({ navigate }) {
     updateContent((current) => ({ ...current, [key]: (current[key] || []).filter((_, itemIndex) => itemIndex !== index) }));
   };
 
+  const updatePerson = (key, index, patch) => {
+    updateContent((current) => {
+      const list = [...(current[key] || [])];
+      list[index] = { ...list[index], ...patch };
+      return { ...current, [key]: list };
+    });
+  };
+
+  const addPerson = (key) => {
+    updateContent((current) => ({
+      ...current,
+      [key]: [...(current[key] || []), { name: "", role: "", imageUrl: "" }],
+    }));
+  };
+
+  const removePerson = (key, index) => {
+    updateContent((current) => ({
+      ...current,
+      [key]: (current[key] || []).filter((_, itemIndex) => itemIndex !== index),
+    }));
+  };
+
   const logout = () => {
     localStorage.removeItem("hcfsme_admin_token");
     setToken("");
@@ -2174,6 +2267,55 @@ function AdminPage({ navigate }) {
                 ))}
               </div>
             </section>
+
+            <section className="settings-card wide">
+              <h3>{t.aboutSettings}</h3>
+              <div className="field-grid">
+                {["associationIntro", "associationPurpose", "mission", "associationStory"].map((key) => (
+                  <label key={key} className="full">{t[key]}
+                    <textarea
+                      rows={5}
+                      value={contentForm.aboutContent?.[key] || ""}
+                      onChange={(event) => updateContent((current) => ({
+                        ...current,
+                        aboutContent: { ...current.aboutContent, [key]: event.target.value },
+                      }))}
+                    />
+                  </label>
+                ))}
+              </div>
+            </section>
+
+            {[
+              ["directorProfiles", t.directorsSettings],
+              ["managementProfiles", t.managementSettings],
+            ].map(([key, label]) => (
+              <section className="settings-card wide" key={key}>
+                <div className="admin-panel-head">
+                  <h3>{label}</h3>
+                  <button className="text-button" onClick={() => addPerson(key)}>{t.addPerson}</button>
+                </div>
+                <div className="people-editor">
+                  {(contentForm[key] || []).map((person, index) => (
+                    <article key={`${key}-${person.name}-${index}`}>
+                      <div className="person-preview">
+                        <img src={person.imageUrl || image.directors[index % image.directors.length]} alt="" />
+                      </div>
+                      <div className="field-grid">
+                        <label>{t.personName}<input value={person.name || ""} onChange={(event) => updatePerson(key, index, { name: event.target.value })} /></label>
+                        <label>{t.personRole}<input value={person.role || ""} onChange={(event) => updatePerson(key, index, { role: event.target.value })} /></label>
+                        <label className="full">{t.personImage}<input value={person.imageUrl || ""} onChange={(event) => updatePerson(key, index, { imageUrl: event.target.value })} placeholder="https://..." /></label>
+                        <label className="upload-button">
+                          {t.uploadImage}
+                          <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updatePerson(key, index, { imageUrl: url }))} />
+                        </label>
+                        <button className="text-button danger" onClick={() => removePerson(key, index)}>{t.removePerson}</button>
+                      </div>
+                    </article>
+                  ))}
+                </div>
+              </section>
+            ))}
 
             <section className="settings-card wide">
               <div className="admin-panel-head">
