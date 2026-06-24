@@ -362,6 +362,37 @@ const news = [
   },
 ];
 
+const defaultActivities = [
+  {
+    title: "近期活動預告",
+    summary: "培訓、研討會、考察團、接待來訪團及政府機構交流安排。",
+    imageUrl: image.news[0],
+    buttonLabel: "查看入口",
+    url: "/subscribe",
+  },
+  {
+    title: "活動回顧",
+    summary: "按年度整理活動圖文、影音與新聞稿，呈現商會服務軌跡。",
+    imageUrl: image.news[1],
+    buttonLabel: "查看入口",
+    url: "/news",
+  },
+  {
+    title: "年度盛事介紹",
+    summary: "包括高峰論壇、頒獎典禮、簽約儀式及跨境交流活動。",
+    imageUrl: image.news[2],
+    buttonLabel: "查看入口",
+    url: "/photo",
+  },
+  {
+    title: "現正招展／報名",
+    summary: "後續可接入展覽、贊助、活動報名與席位查詢入口。",
+    imageUrl: image.news[3],
+    buttonLabel: "查看入口",
+    url: "/application",
+  },
+];
+
 const legalPages = {
   agreement: {
     title: "香港中小企業工商聯合會會員服務協議",
@@ -474,6 +505,7 @@ const defaultPageContent = Object.fromEntries(
 const defaultEditableContent = {
   contact,
   coreServices,
+  activities: defaultActivities,
   memberBenefits,
   downloads,
   directorProfiles: defaultDirectorProfiles,
@@ -500,6 +532,7 @@ function mergeEditableContent(input = {}) {
     ...input,
     contact: { ...contact, ...(input.contact || {}) },
     coreServices: Array.isArray(input.coreServices) ? input.coreServices : coreServices,
+    activities: Array.isArray(input.activities) ? input.activities : defaultActivities,
     memberBenefits: Array.isArray(input.memberBenefits) ? input.memberBenefits : memberBenefits,
     downloads: Array.isArray(input.downloads) ? input.downloads : downloads,
     directorProfiles: Array.isArray(input.directorProfiles) ? input.directorProfiles : defaultDirectorProfiles,
@@ -817,7 +850,7 @@ function RenderPage({ path, navigate, content, siteContact }) {
   if (path === "/directors") page = <DirectorsPage />;
   if (path === "/services") page = <ServicesPage content={content} />;
   if (path === "/industry") page = <IndustryPage />;
-  if (path === "/activities") page = <ActivitiesPage navigate={navigate} />;
+  if (path === "/activities") page = <ActivitiesPage navigate={navigate} content={content} />;
   if (path === "/news") page = <NewsPage />;
   if (path === "/photo") page = <PhotoPage />;
   if (path === "/member-services") page = <MemberServices navigate={navigate} />;
@@ -1353,23 +1386,20 @@ function PhotoPage() {
   );
 }
 
-function ActivitiesPage({ navigate }) {
+function ActivitiesPage({ navigate, content }) {
+  const activityItems = content.activities?.length ? content.activities : defaultActivities;
+
   return (
     <>
       <PageHero {...pages["/activities"]} imageUrl={image.news[0]} />
       <section className="section activity-grid">
-        {[
-          ["近期活動預告", "培訓、研討會、考察團、接待來訪團及政府機構交流安排。", "/subscribe"],
-          ["活動回顧", "按年度整理活動圖文、影音與新聞稿，呈現商會服務軌跡。", "/news"],
-          ["年度盛事介紹", "包括高峰論壇、頒獎典禮、簽約儀式及跨境交流活動。", "/photo"],
-          ["現正招展／報名", "後續可接入展覽、贊助、活動報名與席位查詢入口。", "/application"],
-        ].map(([title, desc, path], index) => (
-          <article key={title}>
-            <img src={image.news[index % image.news.length]} alt={`${title} 活動圖片`} />
+        {activityItems.map((item, index) => (
+          <article key={`${item.title || "activity"}-${index}`}>
+            <img src={item.imageUrl || image.news[index % image.news.length]} alt={`${item.title || "商會活動"} 活動圖片`} />
             <div>
-              <h2>{title}</h2>
-              <p>{desc}</p>
-              <button className="text-button" onClick={() => navigate(path)}>查看入口 <ArrowRight size={16} /></button>
+              <h2>{item.title}</h2>
+              <p>{item.summary}</p>
+              <button className="text-button" onClick={() => navigate(item.url || "/news")}>{item.buttonLabel || "查看入口"} <ArrowRight size={16} /></button>
             </div>
           </article>
         ))}
@@ -1676,11 +1706,11 @@ function AdminPage({ navigate }) {
       edit: "編輯",
       delete: "刪除",
       newsTab: "新聞管理",
-      pagesTab: "頁面內容",
+      pagesTab: "頁面管理",
       settingsTab: "全站設定",
       applicationsTab: "入會記錄",
-      pageContent: "頁面內容",
-      pageContentHelp: "選擇頁面後，可直接修改該頁首屏與前台正在顯示的內容。",
+      pageContent: "頁面管理",
+      pageContentHelp: "像簡易 CMS 一樣管理每個頁面的首屏、內容模組、卡片與附加區塊。",
       frontPageContent: "前台內容",
       frontPageContentHelp: "這裡是目前前台頁面正在使用的資料，可直接修改並保存。",
       noPageSpecificContent: "此頁暫無獨立內容模組，可使用下方內容區塊新增展示內容。",
@@ -1711,6 +1741,13 @@ function AdminPage({ navigate }) {
       removeService: "刪除服務板塊",
       benefitsSettings: "會員權益",
       downloadsSettings: "資源下載",
+      activitiesSettings: "商會活動卡片",
+      cardsSettings: "卡片內容",
+      buttonLabel: "按鈕文字",
+      linkUrl: "跳轉連結",
+      moveUp: "上移",
+      moveDown: "下移",
+      previewPage: "預覽頁面",
       aboutSettings: "商會簡介文案",
       associationIntro: "商會簡介（每段一行）",
       associationPurpose: "本會宗旨（每段一行）",
@@ -1761,11 +1798,11 @@ function AdminPage({ navigate }) {
       edit: "Edit",
       delete: "Delete",
       newsTab: "News",
-      pagesTab: "Pages",
+      pagesTab: "Page management",
       settingsTab: "Site settings",
       applicationsTab: "Applications",
-      pageContent: "Page content",
-      pageContentHelp: "Select a page to edit its hero and the content currently shown on the frontend.",
+      pageContent: "Page management",
+      pageContentHelp: "Manage each page like a simple CMS: hero, frontend modules, cards, and extra blocks.",
       frontPageContent: "Frontend content",
       frontPageContentHelp: "This is the data currently used by the frontend page. Edit and save directly.",
       noPageSpecificContent: "This page has no dedicated content module yet. Use content blocks below to add display content.",
@@ -1796,6 +1833,13 @@ function AdminPage({ navigate }) {
       removeService: "Remove service group",
       benefitsSettings: "Member benefits",
       downloadsSettings: "Downloads",
+      activitiesSettings: "Activity cards",
+      cardsSettings: "Card content",
+      buttonLabel: "Button label",
+      linkUrl: "Link URL",
+      moveUp: "Move up",
+      moveDown: "Move down",
+      previewPage: "Preview page",
       aboutSettings: "Association profile copy",
       associationIntro: "Association intro, one paragraph per line",
       associationPurpose: "Purpose, one paragraph per line",
@@ -2038,6 +2082,22 @@ function AdminPage({ navigate }) {
     }));
   };
 
+  const movePageBlock = (path, index, direction) => {
+    updateContent((current) => {
+      const blocks = [...(current.pages[path]?.blocks || [])];
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= blocks.length) return current;
+      [blocks[index], blocks[nextIndex]] = [blocks[nextIndex], blocks[index]];
+      return {
+        ...current,
+        pages: {
+          ...current.pages,
+          [path]: { ...current.pages[path], blocks },
+        },
+      };
+    });
+  };
+
   const updateService = (index, patch) => {
     updateContent((current) => {
       const coreServicesDraft = [...(current.coreServices || [])];
@@ -2076,6 +2136,38 @@ function AdminPage({ navigate }) {
 
   const removePairListItem = (key, index) => {
     updateContent((current) => ({ ...current, [key]: (current[key] || []).filter((_, itemIndex) => itemIndex !== index) }));
+  };
+
+  const updateCardItem = (key, index, patch) => {
+    updateContent((current) => {
+      const list = [...(current[key] || [])];
+      list[index] = { ...list[index], ...patch };
+      return { ...current, [key]: list };
+    });
+  };
+
+  const addCardItem = (key) => {
+    updateContent((current) => ({
+      ...current,
+      [key]: [
+        ...(current[key] || []),
+        { title: "", summary: "", imageUrl: "", buttonLabel: "查看入口", url: "/" },
+      ],
+    }));
+  };
+
+  const removeCardItem = (key, index) => {
+    updateContent((current) => ({ ...current, [key]: (current[key] || []).filter((_, itemIndex) => itemIndex !== index) }));
+  };
+
+  const moveArrayItem = (key, index, direction) => {
+    updateContent((current) => {
+      const list = [...(current[key] || [])];
+      const nextIndex = index + direction;
+      if (nextIndex < 0 || nextIndex >= list.length) return current;
+      [list[index], list[nextIndex]] = [list[nextIndex], list[index]];
+      return { ...current, [key]: list };
+    });
   };
 
   const updatePerson = (key, index, patch) => {
@@ -2208,6 +2300,43 @@ function AdminPage({ navigate }) {
     </div>
   );
 
+  const renderCardsEditor = (key, label) => (
+    <div className="module-editor card-module-editor">
+      <div className="module-head">
+        <div>
+          <h3>{label}</h3>
+          <p>{t.frontPageContentHelp}</p>
+        </div>
+        <button className="text-button" onClick={() => addCardItem(key)}>{t.addItem}</button>
+      </div>
+      <div className="card-editor-list">
+        {(contentForm[key] || []).map((item, index) => (
+          <article className="cms-card-editor" key={`${key}-${item.title || "card"}-${index}`}>
+            <div className="cms-card-preview">
+              <img src={item.imageUrl || image.news[index % image.news.length]} alt="" />
+            </div>
+            <div className="field-grid">
+              <label>{t.title}<input value={item.title || ""} onChange={(event) => updateCardItem(key, index, { title: event.target.value })} /></label>
+              <label>{t.buttonLabel}<input value={item.buttonLabel || ""} onChange={(event) => updateCardItem(key, index, { buttonLabel: event.target.value })} /></label>
+              <label className="full">{t.summary}<textarea rows={3} value={item.summary || ""} onChange={(event) => updateCardItem(key, index, { summary: event.target.value })} /></label>
+              <label>{t.imageUrl}<input value={item.imageUrl || ""} onChange={(event) => updateCardItem(key, index, { imageUrl: event.target.value })} placeholder="https://..." /></label>
+              <label>{t.linkUrl}<input value={item.url || ""} onChange={(event) => updateCardItem(key, index, { url: event.target.value })} placeholder="/news" /></label>
+              <label className="upload-button">
+                {t.uploadImage}
+                <input type="file" accept="image/png,image/jpeg,image/webp,image/gif" onChange={(event) => uploadImage(event, (url) => updateCardItem(key, index, { imageUrl: url }))} />
+              </label>
+              <div className="item-actions">
+                <button className="secondary" onClick={() => moveArrayItem(key, index, -1)} disabled={index === 0}>{t.moveUp}</button>
+                <button className="secondary" onClick={() => moveArrayItem(key, index, 1)} disabled={index === (contentForm[key] || []).length - 1}>{t.moveDown}</button>
+                <button className="text-button danger" onClick={() => removeCardItem(key, index)}>{t.delete}</button>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  );
+
   const renderContactEditor = () => (
     <div className="field-grid single">
       {["phone", "email", "addressZh", "addressEn"].map((key) => (
@@ -2248,6 +2377,7 @@ function AdminPage({ navigate }) {
     }
     if (selectedPage === "/directors") return renderPeopleEditor("directorProfiles", t.directorsSettings);
     if (selectedPage === "/services") return renderServicesEditor();
+    if (selectedPage === "/activities") return renderCardsEditor("activities", t.activitiesSettings);
     if (selectedPage === "/member-benefits") return renderPairListEditor("memberBenefits", t.benefitsSettings);
     if (selectedPage === "/downloads") return renderPairListEditor("downloads", t.downloadsSettings, true);
     if (selectedPage === "/contact") {
@@ -2397,20 +2527,20 @@ function AdminPage({ navigate }) {
             </aside>
 
             <div className="content-editor-main">
-              <section className="page-module-stack">
-                <div className="section-subhead">
-                  <h3>{t.frontPageContent}</h3>
-                  <p>{t.frontPageContentHelp}</p>
+              <div className="cms-page-toolbar">
+                <div>
+                  <span className="module-chip">{pageNames[selectedPage]}</span>
+                  <h3>{contentForm.pages[selectedPage]?.title || pageNames[selectedPage]}</h3>
+                  <p>{selectedPage}</p>
                 </div>
-                {renderPageSpecificEditor()}
-              </section>
+                <button className="secondary" onClick={() => navigate(selectedPage)}>{t.previewPage}</button>
+              </div>
 
               <section className="module-editor hero-editor">
                 <div className="module-head">
                   <div>
-                    <span className="module-chip">{pageNames[selectedPage]}</span>
-                    <h3>{contentForm.pages[selectedPage]?.title || pageNames[selectedPage]}</h3>
-                    <p>{selectedPage}</p>
+                    <h3>{t.heroTitle}</h3>
+                    <p>{t.pageContentHelp}</p>
                   </div>
                 </div>
                 <div className="field-grid">
@@ -2424,6 +2554,14 @@ function AdminPage({ navigate }) {
                 </div>
               </section>
 
+              <section className="page-module-stack">
+                <div className="section-subhead">
+                  <h3>{t.frontPageContent}</h3>
+                  <p>{t.frontPageContentHelp}</p>
+                </div>
+                {renderPageSpecificEditor()}
+              </section>
+
               <div className="block-list">
                 <div className="section-subhead">
                   <h3>{t.customBlocks}</h3>
@@ -2433,7 +2571,11 @@ function AdminPage({ navigate }) {
                   <article className="content-block-editor" key={`${selectedPage}-${index}`}>
                     <div className="admin-panel-head">
                       <h3>{t.addBlock} {index + 1}</h3>
-                      <button className="text-button danger" onClick={() => removePageBlock(selectedPage, index)}>{t.removeBlock}</button>
+                      <div className="item-actions">
+                        <button className="secondary" onClick={() => movePageBlock(selectedPage, index, -1)} disabled={index === 0}>{t.moveUp}</button>
+                        <button className="secondary" onClick={() => movePageBlock(selectedPage, index, 1)} disabled={index === (contentForm.pages[selectedPage]?.blocks || []).length - 1}>{t.moveDown}</button>
+                        <button className="text-button danger" onClick={() => removePageBlock(selectedPage, index)}>{t.removeBlock}</button>
+                      </div>
                     </div>
                     <div className="field-grid">
                       <label>{t.blockKicker}<input value={block.kicker || ""} onChange={(event) => updatePageBlock(selectedPage, index, { kicker: event.target.value })} /></label>

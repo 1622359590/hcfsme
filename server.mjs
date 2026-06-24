@@ -135,6 +135,36 @@ const seedContent = {
     ["資助計劃簡介", "TVP、BUD、ITF、市場推廣基金等服務資料。", "/services"],
     ["活動相冊", "商會活動影像記錄與年度回顧。", "/photo"],
   ],
+  activities: [
+    {
+      title: "近期活動預告",
+      summary: "培訓、研討會、考察團、接待來訪團及政府機構交流安排。",
+      imageUrl: "https://www.hcfsme.org/wp-content/uploads/2024/06/frc-6deffb397e74f4ff88845165d91ea5a7.jpeg",
+      buttonLabel: "查看入口",
+      url: "/subscribe",
+    },
+    {
+      title: "活動回顧",
+      summary: "按年度整理活動圖文、影音與新聞稿，呈現商會服務軌跡。",
+      imageUrl: "https://www.hcfsme.org/wp-content/uploads/2024/03/20211119_145409620_iOS-scaled-e1637544896380.jpeg",
+      buttonLabel: "查看入口",
+      url: "/news",
+    },
+    {
+      title: "年度盛事介紹",
+      summary: "包括高峰論壇、頒獎典禮、簽約儀式及跨境交流活動。",
+      imageUrl: "https://www.hcfsme.org/wp-content/uploads/2024/03/34.jpeg",
+      buttonLabel: "查看入口",
+      url: "/photo",
+    },
+    {
+      title: "現正招展／報名",
+      summary: "後續可接入展覽、贊助、活動報名與席位查詢入口。",
+      imageUrl: "https://www.hcfsme.org/wp-content/uploads/2023/02/blog-title-img.jpg",
+      buttonLabel: "查看入口",
+      url: "/application",
+    },
+  ],
 };
 
 function tokenFor(password) {
