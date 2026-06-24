@@ -960,20 +960,26 @@ h3 {
   }
 
   .nav-links {
-    position: absolute;
-    top: 66px;
+    position: fixed;
+    top: 80px;
     left: 12px;
     right: 12px;
     display: none;
     padding: 14px;
+    max-height: calc(100dvh - 92px);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+    -webkit-overflow-scrolling: touch;
     background: var(--surface);
     border: 1px solid var(--line);
     border-radius: 18px;
     box-shadow: var(--shadow);
+    z-index: 30;
   }
 
   .nav-links.is-open {
     display: grid;
+    align-content: start;
   }
 
   .nav-item > button {
