@@ -1,0 +1,77 @@
+name: Deploy to server
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Configure SSH
+        run: |
+          set -euo pipefail
+          mkdir -p ~/.ssh
+          printf "%s" "${{ secrets.SERVER_SSH_KEY }}" > ~/.ssh/deploy_key
+          chmod 600 ~/.ssh/deploy_key
+          SSH_PORT="${{ secrets.SERVER_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT=22; fi
+          ssh-keyscan -p "$SSH_PORT" "${{ secrets.SERVER_HOST }}" >> ~/.ssh/known_hosts
+
+      - name: Deploy application
+        run: |
+          set -euo pipefail
+          SSH_PORT="${{ secrets.SERVER_PORT }}"
+          if [ -z "$SSH_PORT" ]; then SSH_PORT=22; fi
+
+          ssh -i ~/.ssh/deploy_key -p "$SSH_PORT" "${{ secrets.SERVER_USER }}@${{ secrets.SERVER_HOST }}" \
+            "DEPLOY_PATH='${{ secrets.DEPLOY_PATH }}' bash -s" <<'REMOTE_SCRIPT'
+          set -euo pipefail
+
+          REPO_URL="https://github.com/1622359590/hcfsme.git"
+          BRANCH="main"
+
+          if [ -z "${DEPLOY_PATH:-}" ]; then
+            echo "Missing DEPLOY_PATH. Add it in GitHub repository secrets."
+            exit 1
+          fi
+
+          if ! command -v node >/dev/null 2>&1; then
+            echo "Node.js is not installed on the server."
+            exit 1
+          fi
+
+          if ! command -v pm2 >/dev/null 2>&1; then
+            echo "PM2 is not installed. Run: npm install -g pm2"
+            exit 1
+          fi
+
+          if [ ! -d "$DEPLOY_PATH/.git" ]; then
+            mkdir -p "$(dirname "$DEPLOY_PATH")"
+            git clone --branch "$BRANCH" "$REPO_URL" "$DEPLOY_PATH"
+          fi
+
+          cd "$DEPLOY_PATH"
+          git fetch origin "$BRANCH"
+          git reset --hard "origin/$BRANCH"
+
+          npm ci
+          npm run build
+          mkdir -p data/uploads
+
+          if [ -f .env.production ]; then
+            set -a
+            . ./.env.production
+            set +a
+          fi
+
+          if [ -z "${ADMIN_PASSWORD:-}" ]; then
+            echo "Missing ADMIN_PASSWORD. Create $DEPLOY_PATH/.env.production first."
+            exit 1
+          fi
+
+          pm2 startOrReload ecosystem.config.cjs --update-env
+          pm2 save
+REMOTE_SCRIPT

@@ -126,6 +126,80 @@ git commit -m "<summary>"
 git push
 ```
 
+## GitHub 自動部署到服務器
+
+推薦使用 GitHub Actions 通過 SSH 自動部署。流程是：本地修改後 push 到 `main`，GitHub Actions 登入服務器，拉取最新代碼，安裝依賴，構建前台，並用 PM2 重啟 Node 服務。
+
+### 1. 服務器準備
+
+在服務器上安裝 Node.js、Git 和 PM2：
+
+```bash
+npm install -g pm2
+```
+
+首次創建部署目錄與環境變量文件：
+
+```bash
+mkdir -p /www/wwwroot/hcfsme
+cd /www/wwwroot/hcfsme
+
+cat > .env.production <<'EOF'
+PORT=8787
+ADMIN_PASSWORD=請換成8位以上且包含字母和數字的密碼
+ADMIN_TOKEN_SECRET=請換成一串更長的隨機密鑰
+DATA_FILE=./data/store.json
+UPLOAD_DIR=./data/uploads
+EOF
+```
+
+`data/store.json` 和 `data/uploads/` 是後台資料與上傳圖片，部署時會保留在服務器上，不會提交到 Git。
+
+### 2. 配置 GitHub Secrets
+
+到 GitHub 倉庫 `Settings -> Secrets and variables -> Actions -> New repository secret` 添加：
+
+```text
+SERVER_HOST      服務器 IP 或域名
+SERVER_USER      SSH 用戶名，例如 root
+SERVER_PORT      SSH 端口，默認 22 可留空
+SERVER_SSH_KEY   SSH 私鑰內容
+DEPLOY_PATH      服務器部署目錄，例如 /www/wwwroot/hcfsme
+```
+
+`SERVER_SSH_KEY` 對應的公鑰需要提前加入服務器的 `~/.ssh/authorized_keys`。
+
+### 3. 觸發部署
+
+推送到 `main` 即可自動部署：
+
+```bash
+git add -A
+git commit -m "Update site"
+git push origin main
+```
+
+也可以在 GitHub 的 `Actions -> Deploy to server -> Run workflow` 手動觸發。
+
+### 4. Nginx 反向代理示例
+
+如果使用 Nginx，將域名代理到 Node 服務端口：
+
+```nginx
+server {
+  listen 80;
+  server_name your-domain.com;
+
+  location / {
+    proxy_pass http://127.0.0.1:8787;
+    proxy_set_header Host $host;
+    proxy_set_header X-Real-IP $remote_addr;
+    proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+    proxy_set_header X-Forwarded-Proto $scheme;
+  }
+}
+```
+
 ## 維護約定
 
 - 每次功能或內容修改後同步更新 README 中相關說明。
